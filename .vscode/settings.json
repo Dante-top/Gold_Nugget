@@ -1,0 +1,8 @@
+{
+    "prettier.endOfLine": "auto",
+    "prettier.htmlWhitespaceSensitivity": "strict",
+    "prettier.requireConfig": false,
+    "vs-code-prettier-eslint.prettierLast": true,
+    "prettier.useTabs": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+}

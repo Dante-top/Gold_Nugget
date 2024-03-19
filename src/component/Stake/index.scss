@@ -1,0 +1,81 @@
+.stake-content {
+	padding: 25px;
+	background-color: #f59b2f;
+	border-radius: 10px;
+	.stake-main-content {
+		background-color: #16151a;
+		border-radius: 10px;
+		color: #fff;
+		.stake-nft {
+			padding: 20px;
+			border-bottom: 2px solid #22274f;
+		}
+		.stake-nft:last-child {
+			border: none;
+		}
+		.img-nft {
+			width: 150px;
+			border-radius: 10px;
+			margin-bottom: 10px;
+		}
+		.nft-value {
+			font-size: 12px;
+			margin-bottom: 0;
+		}
+		.stake-collection {
+			width: 100%;
+			.btn-stake {
+				width: fit-content;
+				padding: 10px 19px;
+				border: none;
+				border-radius: 8px;
+				background-color: #6164ff;
+				color: white;
+				text-align: center;
+				font-size: 15px;
+			}
+			.btn-stake:hover {
+				background-color: #5758a8;
+			}
+		}
+		.divide-line {
+			border-bottom: 2px solid #fff;
+			margin: 0;
+		}
+		.staked-nft {
+			padding: 20px;
+			border-bottom: 2px solid #22274f;
+			width: 100%;
+			.text-date {
+				font-size: 16px;
+				margin-bottom: 0;
+			}
+			.nft-value {
+				margin-left: 25px;
+			}
+			.staked-collection {
+				font-size: 14px;
+				.available-value {
+					color: #ffc90e;
+					font-size: 16px;
+				}
+				.btn-stake {
+					width: fit-content;
+					padding: 10px 19px;
+					border: none;
+					border-radius: 8px;
+					background-color: #6164ff;
+					color: white;
+					text-align: center;
+					font-size: 12px;
+				}
+				.btn-stake:hover {
+					background-color: #5758a8;
+				}
+			}
+		}
+		.staked-nft:last-child {
+			border: none;
+		}
+	}
+}

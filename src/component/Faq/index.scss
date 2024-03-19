@@ -1,0 +1,23 @@
+.faq-content {
+	padding: 20px;
+	background-color: #fff;
+	border-radius: 10px;
+	.faq-title {
+		font-size: 24px;
+		color: #000;
+		margin-bottom: 10px;
+	}
+	.faq-col {
+		padding: 5px;
+		.img-tron {
+			width: 90px;
+			border-radius: 50px;
+		}
+		.faq-desc {
+			.faq-text {
+				font-size: 12px;
+				margin-bottom: 0;
+			}
+		}
+	}
+}
