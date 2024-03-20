@@ -135,8 +135,8 @@ export const unStakeNFT = async (tokenId) => {
 	try {
 		const stakeContract = await getStakeContract();
 		if (stakeContract) {
-			// eslint-disable-next-line
 			try {
+				// eslint-disable-next-line
 				const unStakeTx = await stakeContract
 					.unStakeNFT(tokenId)
 					.send({ callValue: 0 });

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -12,13 +12,15 @@ import { ToastErrMsg } from "./component/Toast";
 function App() {
 	const [account, setAccount] = useState("");
 	// Detect TronLink
-	const detectTronLink = () => {
+	const detectTronLink = useCallback(() => {
+		// Use useCallback to memoize
 		const { tronWeb } = window;
 		return tronWeb && tronWeb.ready;
-	};
+	}, []); // No dependencies, so it only creates the function once
 
 	// Request Account Access
-	const getAccount = async () => {
+	const getAccount = useCallback(async () => {
+		// Use useCallback to memoize
 		if (detectTronLink()) {
 			try {
 				const tronWeb = window.tronWeb;
@@ -34,7 +36,7 @@ function App() {
 				"TronLink is not installed. Please install TronLink to interact with the app."
 			);
 		}
-	};
+	}, [detectTronLink]); // Include detectTronLink as a dependency
 
 	useEffect(() => {
 		const loadAccount = async () => {
@@ -43,7 +45,7 @@ function App() {
 		};
 
 		loadAccount();
-	}, []);
+	}, [getAccount]);
 
 	return (
 		<div className="bg-black">
