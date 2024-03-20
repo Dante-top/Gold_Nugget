@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -7,72 +7,43 @@ import Navbar from "./component/Navbar";
 import Stake from "./component/Stake";
 import Claim from "./component/Claim";
 import Faq from "./component/Faq";
+import { ToastErrMsg } from "./component/Toast";
 
 function App() {
-	const [myDetails, setMyDetails] = useState({
-		name: "",
-		address: "",
-		balance: 0,
-		network: "",
-		link: "false",
-	});
+	const [account, setAccount] = useState("");
+	// Detect TronLink
+	const detectTronLink = () => {
+		const { tronWeb } = window;
+		return tronWeb && tronWeb.ready;
+	};
 
-	const getBalance = async () => {
-		//if wallet installed and logged , getting TRX token balance
-		if (window.tronWeb && window.tronWeb.ready) {
-			let walletBalances = await window.tronWeb.trx.getAccount(
-				window.tronWeb.defaultAddress.base58
-			);
-			return walletBalances;
+	// Request Account Access
+	const getAccount = async () => {
+		if (detectTronLink()) {
+			try {
+				const tronWeb = window.tronWeb;
+				const accounts = await tronWeb.request({
+					method: "tron_requestAccounts",
+				});
+				return accounts[0]; // The first account is usually the user's primary account.
+			} catch (error) {
+				console.error("Error accessing account:", error);
+			}
 		} else {
-			return 0;
+			ToastErrMsg(
+				"TronLink is not installed. Please install TronLink to interact with the app."
+			);
 		}
 	};
 
-	const getWalletDetails = useCallback(async () => {
-		if (window.tronWeb) {
-			//checking if wallet injected
-			if (window.tronWeb.ready) {
-				let tempBalance = await getBalance();
-
-				if (!tempBalance.balance) {
-					tempBalance.balance = 0;
-				}
-
-				//we have wallet and we are logged in
-				setMyDetails({
-					name: window.tronWeb.defaultAddress.name,
-					address: window.tronWeb.defaultAddress.base58,
-					balance: tempBalance.balance / 1000000,
-					network: window.tronWeb.fullNode.host,
-					link: "true",
-				});
-			} else {
-				//we have wallet but not logged in
-				setMyDetails({
-					name: "",
-					address: "",
-					balance: 0,
-					network: "",
-					link: "false",
-				});
-			}
-		} else {
-			setMyDetails({
-				name: "",
-				address: "",
-				balance: 0,
-				network: "",
-				link: "false",
-			});
-			//wallet is not detected at all
-		}
-	}, []); // No dependencies, the function is created only once
-
 	useEffect(() => {
-		getWalletDetails();
-		//wallet checking interval 2sec
-	}, [getWalletDetails]);
+		const loadAccount = async () => {
+			await getAccount();
+			setAccount(window.tronWeb.defaultAddress.base58);
+		};
+
+		loadAccount();
+	}, []);
 
 	return (
 		<div className="bg-black">
@@ -87,10 +58,10 @@ function App() {
 				draggable
 				pauseOnHover
 			/>
-			<Navbar address={myDetails.address} />
-			<Claim address={myDetails.address} />
+			<Navbar address={account} />
+			<Claim address={account} />
 			<Faq />
-			<Stake address={myDetails.address} />
+			<Stake address={account} />
 		</div>
 	);
 }

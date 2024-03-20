@@ -56,7 +56,9 @@ const getTotalSupply = async () => {
 				return { isSuccess: false, error: error };
 			}
 		}
-	} catch (error) {}
+	} catch (error) {
+		return { isSuccess: false, error: error };
+	}
 };
 
 export const getOwnersAddress = async () => {
@@ -71,12 +73,16 @@ export const getOwnersAddress = async () => {
 					for (let i = 0; i < totalSupply; i++) {
 						try {
 							const tokenId = await nftContract.tokenByIndex(i).call();
-							const ownerAddress = await nftContract.ownerOf(tokenId).call();
-							if (ownerAddress.toString()) {
-								ownersList.push({
-									owner: tronWeb.address.fromHex(ownerAddress),
-									tokenId: tokenId,
-								});
+							try {
+								const ownerAddress = await nftContract.ownerOf(tokenId).call();
+								if (ownerAddress.toString()) {
+									ownersList.push({
+										owner: tronWeb.address.fromHex(ownerAddress),
+										tokenId: tokenId,
+									});
+								}
+							} catch (error) {
+								return { isSuccess: false, error: error };
 							}
 						} catch (error) {
 							return { isSuccess: false, error: error };
@@ -87,8 +93,12 @@ export const getOwnersAddress = async () => {
 			} catch (error) {
 				return { isSuccess: false, error: error };
 			}
+		} else {
+			return { isSuccess: false };
 		}
-	} catch (error) {}
+	} catch (error) {
+		return { isSuccess: false, error: error };
+	}
 };
 
 export const stakeNFT = async (tokenId) => {
@@ -96,10 +106,10 @@ export const stakeNFT = async (tokenId) => {
 		const nftContract = await getNFTContract();
 		if (nftContract) {
 			try {
+				// eslint-disable-next-line
 				const approveTx = await nftContract
 					.approve(stakeContractAddress, tokenId)
 					.send({ callValue: 0 });
-				console.log("approveTx: ", approveTx);
 				const stakeContract = await getStakeContract();
 				if (stakeContract) {
 					try {
@@ -126,11 +136,14 @@ export const unStakeNFT = async (tokenId) => {
 		const stakeContract = await getStakeContract();
 		if (stakeContract) {
 			// eslint-disable-next-line
-			const unStakeTx = await stakeContract
-				.unStakeNFT(tokenId)
-				.send({ callValue: 0 });
-
-			return { isSuccess: true, tokenId: tokenId };
+			try {
+				const unStakeTx = await stakeContract
+					.unStakeNFT(tokenId)
+					.send({ callValue: 0 });
+				return { isSuccess: true, tokenId: tokenId };
+			} catch (error) {
+				return { isSuccess: false, error: error };
+			}
 		}
 	} catch (error) {
 		console.log("error: ", error);
@@ -155,7 +168,6 @@ export const claimNFT = async () => {
 							if (transferToken) {
 								return { isSuccess: true };
 							}
-							// }
 						}
 					} catch (error) {
 						if (error.message) {
@@ -171,7 +183,9 @@ export const claimNFT = async () => {
 				return { isSuccess: false };
 			}
 		}
-	} catch (error) {}
+	} catch (error) {
+		return { isSuccess: false };
+	}
 };
 
 export const getMintedList = async () => {
@@ -218,8 +232,8 @@ export const getStakingList = async () => {
 					.stakingBalance(window.tronWeb.defaultAddress.base58)
 					.call();
 				if (stakedTokenIdLength.toString() !== 0) {
-					try {
-						for (let i = 0; i < stakedTokenIdLength.toString(); i++) {
+					for (let i = 0; i < stakedTokenIdLength.toString(); i++) {
+						try {
 							const stakedTokenIds = await stakingContract
 								.tokenIdbyOwners(window.tronWeb.defaultAddress.base58, i)
 								.call();
@@ -234,11 +248,11 @@ export const getStakingList = async () => {
 								date: formattedTime.formattedDate,
 								time: formattedTime.formattedTime,
 							});
+						} catch (error) {
+							return { isSuccess: false, error };
 						}
-						return { isSuccess: true, stakingList };
-					} catch (error) {
-						console.log("error: ", error);
 					}
+					return { isSuccess: true, stakingList };
 				} else {
 					return { isSuccess: false };
 				}
@@ -261,11 +275,15 @@ export const getAvailableStake = async () => {
 					.call();
 				if (stakingBalance) {
 					return { isSuccess: true, stakingBalance };
+				} else {
+					return { isSuccess: false };
 				}
 			} catch (error) {
 				console.log("error: ", error);
 				return { isSuccess: false };
 			}
+		} else {
+			return { isSuccess: false };
 		}
 	} catch (error) {
 		return { isSuccess: false, error };

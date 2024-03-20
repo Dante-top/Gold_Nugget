@@ -84,7 +84,7 @@ const Claim = ({ address }) => {
 	return (
 		<div className="p-3 bg-color">
 			<div className="d-flex row claim-content">
-				<div className="col-md-3 px-3">
+				<div className="col-lg-3 px-3">
 					<div className="row-content d-flex flex-column p-2 row-height">
 						<h5 className="row-title">Recent Gold Nuggets Mined</h5>
 						<div className="address-content d-flex flex-column pr-3">
@@ -111,7 +111,7 @@ const Claim = ({ address }) => {
 						</div>
 					</div>
 				</div>
-				<div className="col-md-6 px-3">
+				<div className="col-lg-6 px-3">
 					<div className="row-content d-flex flex-column p-2 justify-content-start align-items-center">
 						<h5 className="row-title">Next Gold Nugget Mined in:</h5>
 						<Countdown
@@ -142,7 +142,7 @@ const Claim = ({ address }) => {
 						</>
 					</div>
 				</div>
-				<div className="col-md-3 px-3">
+				<div className="col-lg-3 px-3">
 					<div className="row-content d-flex flex-column p-2 row-height">
 						<h5 className="row-title">Top Gold Nugget Miners</h5>
 						<div className="address-content d-flex flex-column pr-0">

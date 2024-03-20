@@ -61,7 +61,7 @@ const Stake = () => {
 	return (
 		<div className="p-3">
 			<div className="stake-content d-flex flex-column">
-				<div className="d-flex justify-content-between align-items-center text-white p-2">
+				<div className="d-flex justify-content-between align-items-center text-white p-2 stake-title">
 					<h1 className="stake-title">Available NFT's</h1>
 					<div className="d-flex flex-column justify-content-center align-items-end">
 						<h2 className="title-remain">
@@ -108,7 +108,7 @@ const Stake = () => {
 							key={index}
 						>
 							<div className="d-flex flex-column justify-content-center align-items-start">
-								<div className="d-flex gap-4 align-items-center">
+								<div className="d-flex gap-4 align-items-center staked-responsive">
 									<img
 										src={Img_Minted}
 										className="img-nft"
@@ -125,7 +125,7 @@ const Stake = () => {
 									<p className="nft-value">Rarity Rank: 75</p>
 								</div>
 							</div>
-							<div className="staked-collection d-flex flex justify-content-center align-items-start gap-3">
+							<div className="staked-collection d-flex gap-3">
 								<div>
 									Available Gold Nugget:{" "}
 									<span className="available-value">0</span>

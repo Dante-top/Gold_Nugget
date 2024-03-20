@@ -53,3 +53,9 @@
 .btn-claim:hover {
 	background-color: #5758a8;
 }
+
+@media (max-width: 991px) {
+	.claim-content {
+		gap: 15px;
+	}
+}
