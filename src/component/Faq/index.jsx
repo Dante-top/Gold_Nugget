@@ -25,7 +25,7 @@ const Faq = () => {
 	return (
 		<div className="p-3 mb-2">
 			<div className="faq-content d-flex flex-column">
-				<h3 className="faq-title">Lets get the Full Pictire...</h3>
+				<h3 className="faq-title">Lets get the Full Picture...</h3>
 				{faqData.items.map((item, index) => (
 					<div
 						className="faq-col d-flex mb-3 gap-3 align-items-center"

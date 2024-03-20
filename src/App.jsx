@@ -50,14 +50,21 @@ function App() {
 			} else {
 				//we have wallet but not logged in
 				setMyDetails({
-					name: "none",
-					address: "none",
+					name: "",
+					address: "",
 					balance: 0,
-					network: "none",
+					network: "",
 					link: "false",
 				});
 			}
 		} else {
+			setMyDetails({
+				name: "",
+				address: "",
+				balance: 0,
+				network: "",
+				link: "false",
+			});
 			//wallet is not detected at all
 		}
 	}, []); // No dependencies, the function is created only once

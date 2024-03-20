@@ -203,7 +203,9 @@ export const getMintedList = async () => {
 				return { isSuccess: false, error };
 			}
 		}
-	} catch (error) {}
+	} catch (error) {
+		return { isSuccess: false, error };
+	}
 };
 
 export const getStakingList = async () => {
@@ -244,7 +246,9 @@ export const getStakingList = async () => {
 				console.log("error: ", error);
 			}
 		}
-	} catch (error) {}
+	} catch (error) {
+		return { isSuccess: false, error };
+	}
 };
 
 export const getAvailableStake = async () => {
@@ -263,7 +267,9 @@ export const getAvailableStake = async () => {
 				return { isSuccess: false };
 			}
 		}
-	} catch (error) {}
+	} catch (error) {
+		return { isSuccess: false, error };
+	}
 };
 
 const convertTimestampToCustomFormat = (timestamp) => {
