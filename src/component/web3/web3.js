@@ -5,18 +5,12 @@ const SolidityNode = "https://api.shasta.trongrid.io";
 const EventServer = "https://api.shasta.trongrid.io";
 const privateKey = process.env.REACT_APP_PRIVATE_KEY;
 
-const tronWeb = new TronWeb(FullNode, SolidityNode, EventServer, privateKey);
+const tronWeb = new TronWeb({
+	fullHost: "https://api.shasta.trongrid.io",
+});
 
-const tokenContractAddress = process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS || "";
 const nftContractAddress = process.env.REACT_APP_NFT_CONTRACT_ADDRESS || "";
 const stakeContractAddress = process.env.REACT_APP_STAKE_CONTRACT_ADDRESS || "";
-
-const getTokenContract = async () => {
-	if (tronWeb && tronWeb.defaultAddress.base58) {
-		const tokenContract = await tronWeb.contract().at(tokenContractAddress);
-		return tokenContract;
-	}
-};
 
 const getNFTContract = async () => {
 	if (window) {
@@ -44,57 +38,34 @@ const getStakeContract = async () => {
 	}
 };
 
-const getTotalSupply = async () => {
-	try {
-		const nftContract = await getNFTContract();
-
-		if (nftContract) {
-			try {
-				const result = await nftContract.totalSupply().call();
-				return { isSuccess: true, totalSupply: result.toString() };
-			} catch (error) {
-				return { isSuccess: false, error: error };
-			}
-		}
-	} catch (error) {
-		return { isSuccess: false, error: error };
-	}
-};
-
 export const getOwnersAddress = async () => {
 	let ownersList = [];
 	try {
-		const nftContract = await getNFTContract();
-		if (nftContract) {
+		const stakeContract = await getStakeContract();
+		if (stakeContract) {
 			try {
-				const resTotal = await getTotalSupply();
-				if (resTotal) {
-					const totalSupply = resTotal.totalSupply;
-					for (let i = 0; i < totalSupply; i++) {
-						try {
-							const tokenId = await nftContract.tokenByIndex(i).call();
-							try {
-								const ownerAddress = await nftContract.ownerOf(tokenId).call();
-								if (ownerAddress.toString()) {
-									ownersList.push({
-										owner: tronWeb.address.fromHex(ownerAddress),
-										tokenId: tokenId,
-									});
-								}
-							} catch (error) {
-								return { isSuccess: false, error: error };
-							}
-						} catch (error) {
-							return { isSuccess: false, error: error };
-						}
+				const goldTokenOwnersList = await stakeContract
+					.getAllMeowTokenOwners()
+					.call();
+				if (goldTokenOwnersList) {
+					console.log("tokenOwner: ", goldTokenOwnersList[0][1]);
+					for (let i = 0; i < goldTokenOwnersList[0].length; i++) {
+						const owner = tronWeb.address.fromHex(goldTokenOwnersList[0][i]);
+						const tokenAmount = goldTokenOwnersList[1][i].toString();
+						ownersList.push({ owner, tokenAmount });
 					}
+					// Sort the list by tokenAmount in descending order
+					ownersList.sort(
+						(a, b) => parseInt(b.tokenAmount) - parseInt(a.tokenAmount)
+					);
+
 					return { isSuccess: true, ownersList: ownersList };
+				} else {
+					return { isSuccess: false };
 				}
 			} catch (error) {
 				return { isSuccess: false, error: error };
 			}
-		} else {
-			return { isSuccess: false };
 		}
 	} catch (error) {
 		return { isSuccess: false, error: error };
@@ -110,18 +81,24 @@ export const stakeNFT = async (tokenId) => {
 				const approveTx = await nftContract
 					.approve(stakeContractAddress, tokenId)
 					.send({ callValue: 0 });
-				const stakeContract = await getStakeContract();
-				if (stakeContract) {
-					try {
-						// eslint-disable-next-line
-						const stakeTx = await stakeContract
-							.stakeNFT(tokenId)
-							.send({ callValue: 0 });
-						return { isSuccess: true, tokenId: tokenId };
-					} catch (error) {
-						console.log("stakeError: ", error);
-						return { isSuccess: false, error: error };
+				console.log("tokenId: ", tokenId);
+				try {
+					const stakeContract = await getStakeContract();
+					if (stakeContract) {
+						try {
+							const stakeTx = await stakeContract
+								.stakeNFT(tokenId)
+								.send({ from: nftContractAddress, callValue: 0 });
+							console.log("stakeTx: ", stakeTx);
+							return { isSuccess: true, tokenId: tokenId };
+						} catch (error) {
+							console.log("stakeError: ", error);
+							return { isSuccess: false, error: error };
+						}
 					}
+				} catch (error) {
+					console.log("error: ", error);
+					return { isSuccess: false, error: error };
 				}
 			} catch (error) {
 				console.log("error: ", error);
@@ -152,39 +129,33 @@ export const unStakeNFT = async (tokenId) => {
 };
 
 export const claimNFT = async () => {
-	try {
-		const stakeContract = await getStakeContract();
-		if (stakeContract) {
-			try {
-				const rewardAddress = await stakeContract.getRewardAddress().call();
-				if (rewardAddress) {
-					try {
-						const tokenContract = await getTokenContract();
-						if (tokenContract) {
-							const rewardRate = 36;
-							const transferToken = await tokenContract
-								.transfer(rewardAddress, rewardRate)
-								.send({ from: tronWeb.defaultAddress.base58, callValue: 0 });
-							if (transferToken) {
-								return { isSuccess: true };
-							}
-						}
-					} catch (error) {
-						if (error.message) {
-							console.log("error: ", error.message);
-							return { isSuccess: false, error: error.message };
-						} else {
-							return { isSuccess: false };
-						}
+	const tronWeb = new TronWeb(FullNode, SolidityNode, EventServer, privateKey);
+
+	if (tronWeb && tronWeb.defaultAddress.base58) {
+		try {
+			const stakeContract = await tronWeb.contract().at(stakeContractAddress);
+			if (stakeContract) {
+				try {
+					const claimTX = await stakeContract
+						.claimNFT()
+						.send({ from: stakeContractAddress, callValue: 0 });
+					console.log("claimTX: ", claimTX);
+					if (claimTX) {
+						return { isSuccess: true };
+					} else {
+						return { isSuccess: false };
+					}
+				} catch (error) {
+					if (error.message) {
+						return { isSuccess: false, error: error.message };
+					} else {
+						return { isSuccess: false };
 					}
 				}
-			} catch (error) {
-				console.log("error: ", error);
-				return { isSuccess: false };
 			}
+		} catch (error) {
+			return { isSuccess: false };
 		}
-	} catch (error) {
-		return { isSuccess: false };
 	}
 };
 
@@ -207,18 +178,18 @@ export const getMintedList = async () => {
 							mintedList.push({ tokenId: mintedNFT.toString() });
 						} catch (error) {
 							console.log("error: ", error);
-							return { isSuccess: false, error };
+							return { isSuccess: false, error, mintedList: [] };
 						}
 					}
 					return { isSuccess: true, mintedList };
 				}
 			} catch (error) {
 				console.log("error: ", error);
-				return { isSuccess: false, error };
+				return { isSuccess: false, error, mintedList: [] };
 			}
 		}
 	} catch (error) {
-		return { isSuccess: false, error };
+		return { isSuccess: false, error, mintedList: [] };
 	}
 };
 
@@ -249,19 +220,19 @@ export const getStakingList = async () => {
 								time: formattedTime.formattedTime,
 							});
 						} catch (error) {
-							return { isSuccess: false, error };
+							return { isSuccess: false, error, stakingList: [] };
 						}
 					}
 					return { isSuccess: true, stakingList };
 				} else {
-					return { isSuccess: false };
+					return { isSuccess: false, stakingList: [] };
 				}
 			} catch (error) {
 				console.log("error: ", error);
 			}
 		}
 	} catch (error) {
-		return { isSuccess: false, error };
+		return { isSuccess: false, error, stakingList: [] };
 	}
 };
 

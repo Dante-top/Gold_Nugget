@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import "./index.scss";
-import { claimNFT, getAvailableStake, getOwnersAddress } from "../web3/web3";
+import { claimNFT, getOwnersAddress } from "../web3/web3";
 import Countdown from "react-countdown";
 import { ToastErrMsg, ToastSuccessMsg } from "../Toast";
 const ownerAddress = process.env.REACT_APP_OWNER_ADDRESS || "";
@@ -9,7 +9,6 @@ const Claim = ({ address }) => {
 	const [ownersList, setOwnersList] = useState([]);
 	const [isOwner, setIsOwner] = useState(false);
 	const [isClaiming, setIsClaiming] = useState(false);
-	const [availableNFT, setAvailableNFT] = useState(0);
 
 	const handleClaim = useCallback(async () => {
 		if (isOwner) {
@@ -35,13 +34,13 @@ const Claim = ({ address }) => {
 
 	useEffect(() => {
 		setMinedAddress();
-		availableStakes();
+		// availableStakes();
 		if (address === ownerAddress) {
 			setIsOwner(true);
 		} else {
 			setIsOwner(false);
 		}
-	}, [ownersList, address]);
+	}, [address]);
 
 	useEffect(() => {
 		const interval = setInterval(async () => {
@@ -60,15 +59,6 @@ const Claim = ({ address }) => {
 			setOwnersList(resData.ownersList);
 		} else {
 			console.log("error: ", resData.error);
-		}
-	};
-
-	const availableStakes = async () => {
-		const resData = await getAvailableStake();
-		if (resData.isSuccess) {
-			setAvailableNFT(resData.stakingBalance);
-		} else {
-			setAvailableNFT(0);
 		}
 	};
 
@@ -121,7 +111,7 @@ const Claim = ({ address }) => {
 							)}
 						/>
 						<h5 className="row-title">Available Gold Nugget</h5>
-						<h3 className="text-black mb-2">{availableNFT.toString()}</h3>
+						<h3 className="text-black mb-2">36</h3>
 						<>
 							{!isClaiming ? (
 								<button
@@ -164,7 +154,7 @@ const Claim = ({ address }) => {
 											)}`}
 									</span>
 									<span className="text-address">
-										{item.tokenId.toString()}
+										{item.tokenAmount.toString()}
 									</span>
 								</div>
 							))}
