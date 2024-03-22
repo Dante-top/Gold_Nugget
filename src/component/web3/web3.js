@@ -9,8 +9,22 @@ const tronWeb = new TronWeb({
 	fullHost: "https://api.shasta.trongrid.io",
 });
 
+const tokenContractAddress = process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS || "";
 const nftContractAddress = process.env.REACT_APP_NFT_CONTRACT_ADDRESS || "";
 const stakeContractAddress = process.env.REACT_APP_STAKE_CONTRACT_ADDRESS || "";
+
+const getTokenContract = async () => {
+	if (window) {
+		try {
+			if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
+				const tokenContract = await window.tronWeb
+					.contract()
+					.at(tokenContractAddress);
+				return tokenContract;
+			}
+		} catch (error) {}
+	}
+};
 
 const getNFTContract = async () => {
 	if (window) {
@@ -35,6 +49,27 @@ const getStakeContract = async () => {
 				return stakeContract;
 			}
 		} catch (error) {}
+	}
+};
+
+export const getAvailableToken = async () => {
+	let balance = 0;
+	try {
+		const tokenContract = await getTokenContract();
+		if (tokenContract) {
+			try {
+				balance = await tokenContract
+					.balanceOf(window.tronWeb.defaultAddress.base58)
+					.call();
+				if (balance) {
+					return { isSuccess: true, balance: balance.toString() };
+				}
+			} catch (error) {
+				return { isSuccess: false, balance: 0 };
+			}
+		}
+	} catch (error) {
+		return { isSuccess: false, balance: 0 };
 	}
 };
 

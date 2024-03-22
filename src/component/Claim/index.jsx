@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import "./index.scss";
-import { claimNFT, getOwnersAddress } from "../web3/web3";
+import { claimNFT, getAvailableToken, getOwnersAddress } from "../web3/web3";
 import Countdown from "react-countdown";
 import { ToastErrMsg, ToastSuccessMsg } from "../Toast";
 const ownerAddress = process.env.REACT_APP_OWNER_ADDRESS || "";
 
 const Claim = ({ address }) => {
 	const [ownersList, setOwnersList] = useState([]);
+	const [available, setAvailable] = useState(0);
 	const [isOwner, setIsOwner] = useState(false);
 	const [isClaiming, setIsClaiming] = useState(false);
 
@@ -34,13 +35,14 @@ const Claim = ({ address }) => {
 
 	useEffect(() => {
 		setMinedAddress();
+		setAvailableToken();
 		// availableStakes();
 		if (address === ownerAddress) {
 			setIsOwner(true);
 		} else {
 			setIsOwner(false);
 		}
-	}, [address]);
+	}, [address, ownersList]);
 
 	useEffect(() => {
 		const interval = setInterval(async () => {
@@ -59,6 +61,15 @@ const Claim = ({ address }) => {
 			setOwnersList(resData.ownersList);
 		} else {
 			console.log("error: ", resData.error);
+		}
+	};
+
+	const setAvailableToken = async () => {
+		const resData = await getAvailableToken();
+		if (resData.isSuccess) {
+			setAvailable(resData.balance);
+		} else {
+			setAvailable(0);
 		}
 	};
 
@@ -111,7 +122,7 @@ const Claim = ({ address }) => {
 							)}
 						/>
 						<h5 className="row-title">Available Gold Nugget</h5>
-						<h3 className="text-black mb-2">36</h3>
+						<h3 className="text-black mb-2">{available}</h3>
 						<>
 							{!isClaiming ? (
 								<button
