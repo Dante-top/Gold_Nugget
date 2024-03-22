@@ -36,15 +36,27 @@
 		justify-content: center;
 		flex-direction: row;
 		gap: 10px;
-		margin-top: 15px;
+		flex-grow: 0 !important;
+		flex-basis: fit-content !important;
+		align-items: center;
+		margin: 0;
 	}
 	.social-responsive {
 		flex-direction: row !important;
 	}
+	.navbar-title {
+		display: none;
+	}
 }
 
 @media (max-width: 432px) {
-	.navbar-title {
-		display: none;
+	.navbar_responsive {
+		margin-top: 15px;
+		flex-grow: 1 !important;
+		flex-basis: 50% !important;
+		justify-content: start;
+		.social-responsive {
+			margin-left: 0 !important;
+		}
 	}
 }

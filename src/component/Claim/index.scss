@@ -1,5 +1,7 @@
 .bg-color {
-	background-color: #6164ff;
+	background-image: url("../../assets/images/bg_banner.jpg");
+	background-repeat: no-repeat;
+	background-size: cover;
 }
 .claim-content {
 	padding: 10px;
@@ -52,6 +54,10 @@
 
 .btn-claim:hover {
 	background-color: #5758a8;
+}
+
+.bg-pin {
+	background-color: #ffc90e;
 }
 
 @media (max-width: 991px) {

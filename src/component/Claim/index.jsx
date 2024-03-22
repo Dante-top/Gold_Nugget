@@ -154,7 +154,9 @@ const Claim = ({ address }) => {
 							</div>
 							{ownersList.map((item, index) => (
 								<div
-									className="d-flex justify-content-between align-items-center"
+									className={`d-flex justify-content-between align-items-center ${
+										item.owner === address ? "bg-pin" : ""
+									}`}
 									key={index}
 								>
 									<span className="text-address">{index + 1}</span>
