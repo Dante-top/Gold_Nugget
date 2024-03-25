@@ -83,11 +83,13 @@ export const getOwnersAddress = async () => {
 					.getAllMeowTokenOwners()
 					.call();
 				if (goldTokenOwnersList) {
-					console.log("tokenOwner: ", goldTokenOwnersList[0][1]);
 					for (let i = 0; i < goldTokenOwnersList[0].length; i++) {
 						const owner = tronWeb.address.fromHex(goldTokenOwnersList[0][i]);
 						const tokenAmount = goldTokenOwnersList[1][i].toString();
-						ownersList.push({ owner, tokenAmount });
+						const rewardTime = convertTimestampToFormattedDate(
+							goldTokenOwnersList[2][i].toString()
+						);
+						ownersList.push({ owner, tokenAmount, rewardTime });
 					}
 					// Sort the list by tokenAmount in descending order
 					ownersList.sort(
@@ -317,4 +319,18 @@ const convertTimestampToCustomFormat = (timestamp) => {
 	const formattedTime = timeFormat.format(date);
 
 	return { formattedDate, formattedTime };
+};
+
+const convertTimestampToFormattedDate = (timestamp) => {
+	const date = new Date(timestamp * 1000); // Assuming timestamp is in seconds
+	const months = date.getMonth() + 1; // getMonth() returns month from 0-11
+	const days = date.getDate();
+	let hours = date.getHours();
+	const minutes = date.getMinutes();
+
+	const minutesStr = minutes < 10 ? "0" + minutes : minutes;
+	const monthsStr = months < 10 ? "0" + months : months;
+	const daysStr = days < 10 ? "0" + days : days;
+
+	return `${monthsStr}/${daysStr}, ${hours}:${minutesStr}`;
 };

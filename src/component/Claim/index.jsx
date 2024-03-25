@@ -97,9 +97,8 @@ const Claim = ({ address }) => {
 							</div>
 							{ownersList.map((item, index) => (
 								<div className="d-flex justify-content-between" key={index}>
-									<div className="d-flex justify-content-between count-width">
-										<span className="text-address">{index + 1}</span>
-										<span className="text-address">-</span>
+									<div className="d-flex justify-content-between">
+										<span className="text-address">{item.rewardTime}</span>
 									</div>
 									<span className="text-address">
 										{item.owner &&
