@@ -15,7 +15,6 @@ function App() {
 	const detectTronLink = () => {
 		// Use useCallback to memoize
 		const { tronWeb } = window;
-		console.log(tronWeb.ready);
 		return tronWeb && tronWeb.ready;
 	}; // No dependencies, so it only creates the function once
 

@@ -1,4 +1,5 @@
 import TronWeb from "tronweb";
+import { ToastErrMsg } from "../Toast";
 
 const FullNode = "https://api.shasta.trongrid.io";
 const SolidityNode = "https://api.shasta.trongrid.io";
@@ -110,39 +111,48 @@ export const getOwnersAddress = async () => {
 };
 
 export const stakeNFT = async (tokenId) => {
+	const stakingFee = 10000000;
+
 	try {
 		const nftContract = await getNFTContract();
-		if (nftContract) {
-			try {
-				// eslint-disable-next-line
-				const approveTx = await nftContract
-					.approve(stakeContractAddress, tokenId)
-					.send({ callValue: 0 });
-				console.log("tokenId: ", tokenId);
+		const balance = await tronWeb.trx.getBalance(tronWeb.defaultAddress.base58);
+		if (balance < stakingFee) {
+			if (nftContract) {
 				try {
-					const stakeContract = await getStakeContract();
-					if (stakeContract) {
-						try {
-							const stakeTx = await stakeContract
-								.stakeNFT(tokenId)
-								.send({ from: nftContractAddress, callValue: 0 });
-							console.log("stakeTx: ", stakeTx);
-							return { isSuccess: true, tokenId: tokenId };
-						} catch (error) {
-							console.log("stakeError: ", error);
-							return { isSuccess: false, error: error };
+					// eslint-disable-next-line
+					const approveTx = await nftContract
+						.approve(stakeContractAddress, tokenId)
+						.send({ callValue: 0 });
+					try {
+						const stakeContract = await getStakeContract();
+						if (stakeContract) {
+							try {
+								// eslint-disable-next-line
+								const stakeTx = await stakeContract
+									.stakeNFT(tokenId)
+									.send({ from: nftContractAddress, callValue: stakingFee });
+								return { isSuccess: true, tokenId: tokenId };
+							} catch (error) {
+								console.log("stakeError: ", error);
+								return { isSuccess: false, error: error };
+							}
 						}
+					} catch (error) {
+						console.log("error: ", error);
+						return { isSuccess: false, error: error };
 					}
 				} catch (error) {
 					console.log("error: ", error);
 					return { isSuccess: false, error: error };
 				}
-			} catch (error) {
-				console.log("error: ", error);
-				return { isSuccess: false, error: error };
 			}
+		} else {
+			ToastErrMsg("Insufficient funds for staking!");
+			return { isSuccess: false };
 		}
-	} catch (error) {}
+	} catch (error) {
+		return { isSuccess: false, error: error };
+	}
 };
 
 export const unStakeNFT = async (tokenId) => {
@@ -176,7 +186,6 @@ export const claimNFT = async () => {
 					const claimTX = await stakeContract
 						.claimNFT()
 						.send({ from: stakeContractAddress, callValue: 0 });
-					console.log("claimTX: ", claimTX);
 					if (claimTX) {
 						return { isSuccess: true };
 					} else {
