@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -11,6 +11,7 @@ import { ToastErrMsg } from "./component/Toast";
 
 function App() {
 	const [account, setAccount] = useState("");
+	const accountRef = useRef(account);
 	// Detect TronLink
 	const detectTronLink = () => {
 		// Use useCallback to memoize
@@ -45,7 +46,7 @@ function App() {
 		};
 
 		loadAccount();
-	}, [account]);
+	}, [accountRef]);
 
 	return (
 		<div className="bg-black">

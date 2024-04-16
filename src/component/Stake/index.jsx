@@ -1,6 +1,6 @@
 import "./index.scss";
 import Img_Minted from "../../assets/images/nft.jpg";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	getMintedList,
 	getStakingList,
@@ -14,11 +14,12 @@ const Stake = () => {
 	const [mintedData, setMintedData] = useState([]);
 	const [isStaking, setIsStaking] = useState(false);
 	const [isUnStaking, setIsUnStaking] = useState({});
+	const stakedDataRef = useRef(stakedData);
 
 	useEffect(() => {
 		setStakedNFTData();
 		setMintedNFTData();
-	}, [stakedData]);
+	}, [stakedDataRef]);
 
 	const setStakedNFTData = async () => {
 		const resData = await getStakingList();

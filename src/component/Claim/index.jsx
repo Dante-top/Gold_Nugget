@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import "./index.scss";
 import { claimNFT, getAvailableToken, getOwnersAddress } from "../web3/web3";
 import Countdown from "react-countdown";
@@ -10,6 +10,8 @@ const Claim = ({ address }) => {
 	const [available, setAvailable] = useState(0);
 	const [isOwner, setIsOwner] = useState(false);
 	const [isClaiming, setIsClaiming] = useState(false);
+	const addressRef = useRef(address);
+	const ownersListRef = useRef(ownersList);
 
 	const handleClaim = useCallback(async () => {
 		if (isOwner) {
@@ -42,7 +44,7 @@ const Claim = ({ address }) => {
 		} else {
 			setIsOwner(false);
 		}
-	}, [address, ownersList]);
+	}, [addressRef, ownersListRef]);
 
 	useEffect(() => {
 		const interval = setInterval(async () => {

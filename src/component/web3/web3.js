@@ -5,13 +5,14 @@ const FullNode = "https://api.trongrid.io";
 const SolidityNode = "https://api.trongrid.io";
 const EventServer = "https://api.trongrid.io";
 const privateKey = process.env.REACT_APP_PRIVATE_KEY;
-const apiKey = process.env.REACT_APP_TRON_API_KEY;
 
 // Initialize TronWeb
-const tronWeb = new TronWeb({
-	fullHost: FullNode,
-	headers: { "TRON-PRO-API-KEY": apiKey }, // This is a hypothetical example; adjust based on actual API requirements
-});
+// const tronWeb = new TronWeb({
+// 	fullHost: FullNode,
+// 	headers: { "TRON-PRO-API-KEY": apiKey }, // This is a hypothetical example; adjust based on actual API requirements
+// });
+
+const tronWeb = new TronWeb(FullNode, SolidityNode, EventServer);
 
 const tokenContractAddress = process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS || "";
 const nftContractAddress = process.env.REACT_APP_NFT_CONTRACT_ADDRESS || "";
@@ -218,8 +219,7 @@ export const getMintedList = async () => {
 				const balance = await nftContract
 					.balanceOf(window.tronWeb.defaultAddress.base58)
 					.call();
-				console.log("balance: ", balance.toString());
-				if (balance.toString()) {
+				if (balance.toString() !== 0) {
 					for (let i = 0; i < balance.toString(); i++) {
 						try {
 							const mintedNFT = await nftContract
