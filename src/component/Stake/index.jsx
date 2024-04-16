@@ -50,7 +50,6 @@ const Stake = () => {
 		setIsUnStaking((prev) => ({ ...prev, [tokenId]: true }));
 		const resUnStakeData = await unStakeNFT(tokenId);
 		if (resUnStakeData.isSuccess) {
-			setIsUnStaking((prev) => ({ ...prev, [tokenId]: false }));
 			ToastSuccessMsg("Unstake Success!");
 		} else {
 			setIsUnStaking((prev) => ({ ...prev, [tokenId]: false }));

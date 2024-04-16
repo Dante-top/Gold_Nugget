@@ -17,8 +17,8 @@ const Faq = () => {
 				desc: "Our system operates by rewarding 1 user who has staked Meme Chicks Nft's. Every 6 hours there is a new opportunity to mine 36 new Gold Nugget tokens. The more NFTs you have staked, the higher your chances of successfully mining the elusive Gold Nugget tokens. The selection of the winning address for each batch of Gold Nugget tokens is determined through a random number generator.",
 			},
 			{
-				title: "Staking Fee",
-				desc: "The fee's collected over time will allow for us to keep the project running and continue to build. We will be adding to swap liquidity, paying the running cost, artist and developers. The Fee will also incentivize keeping the NFTs staked, increasing the scarcity of finding a Meme Chick on a NFT marketplace. (The Staking Fee is 10 Tron per NFT)",
+				title: "UnStaking Fee",
+				desc: "The fee's collected over time will allow for us to keep the project running and continue to build. We will be adding to swap liquidity, paying the running cost, artist and developers. The Unstaking Fee will also incentivize keeping the NFTs staked, increasing the scarcity of finding a Meme Chick on a NFT marketplace. (Unstaking Fee is 10 Tron per NFT)",
 			},
 		],
 	};

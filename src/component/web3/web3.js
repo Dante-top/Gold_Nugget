@@ -1,13 +1,16 @@
 import TronWeb from "tronweb";
 import { ToastErrMsg } from "../Toast";
 
-const FullNode = "https://api.shasta.trongrid.io";
-const SolidityNode = "https://api.shasta.trongrid.io";
-const EventServer = "https://api.shasta.trongrid.io";
+const FullNode = "https://api.trongrid.io";
+const SolidityNode = "https://api.trongrid.io";
+const EventServer = "https://api.trongrid.io";
 const privateKey = process.env.REACT_APP_PRIVATE_KEY;
+const apiKey = process.env.REACT_APP_TRON_API_KEY;
 
+// Initialize TronWeb
 const tronWeb = new TronWeb({
-	fullHost: "https://api.shasta.trongrid.io",
+	fullHost: FullNode,
+	headers: { "TRON-PRO-API-KEY": apiKey }, // This is a hypothetical example; adjust based on actual API requirements
 });
 
 const tokenContractAddress = process.env.REACT_APP_TOKEN_CONTRACT_ADDRESS || "";
@@ -111,44 +114,36 @@ export const getOwnersAddress = async () => {
 };
 
 export const stakeNFT = async (tokenId) => {
-	const stakingFee = 10000000;
-
 	try {
 		const nftContract = await getNFTContract();
-		const balance = await tronWeb.trx.getBalance(tronWeb.defaultAddress.base58);
-		if (balance < stakingFee) {
-			if (nftContract) {
+		if (nftContract) {
+			try {
+				// eslint-disable-next-line
+				const approveTx = await nftContract
+					.approve(stakeContractAddress, tokenId)
+					.send({ callValue: 0 });
 				try {
-					// eslint-disable-next-line
-					const approveTx = await nftContract
-						.approve(stakeContractAddress, tokenId)
-						.send({ callValue: 0 });
-					try {
-						const stakeContract = await getStakeContract();
-						if (stakeContract) {
-							try {
-								// eslint-disable-next-line
-								const stakeTx = await stakeContract
-									.stakeNFT(tokenId)
-									.send({ from: nftContractAddress, callValue: stakingFee });
-								return { isSuccess: true, tokenId: tokenId };
-							} catch (error) {
-								console.log("stakeError: ", error);
-								return { isSuccess: false, error: error };
-							}
+					const stakeContract = await getStakeContract();
+					if (stakeContract) {
+						try {
+							// eslint-disable-next-line
+							const stakeTx = await stakeContract
+								.stakeNFT(tokenId)
+								.send({ from: nftContractAddress, callValue: 0 });
+							return { isSuccess: true, tokenId: tokenId };
+						} catch (error) {
+							console.log("stakeError: ", error);
+							return { isSuccess: false, error: error };
 						}
-					} catch (error) {
-						console.log("error: ", error);
-						return { isSuccess: false, error: error };
 					}
 				} catch (error) {
 					console.log("error: ", error);
 					return { isSuccess: false, error: error };
 				}
+			} catch (error) {
+				console.log("error: ", error);
+				return { isSuccess: false, error: error };
 			}
-		} else {
-			ToastErrMsg("Insufficient funds for staking!");
-			return { isSuccess: false };
 		}
 	} catch (error) {
 		return { isSuccess: false, error: error };
@@ -156,18 +151,27 @@ export const stakeNFT = async (tokenId) => {
 };
 
 export const unStakeNFT = async (tokenId) => {
+	const unStakingFee = 10000000;
+
 	try {
 		const stakeContract = await getStakeContract();
-		if (stakeContract) {
-			try {
-				// eslint-disable-next-line
-				const unStakeTx = await stakeContract
-					.unStakeNFT(tokenId)
-					.send({ callValue: 0 });
-				return { isSuccess: true, tokenId: tokenId };
-			} catch (error) {
-				return { isSuccess: false, error: error };
+		const address = window.tronWeb.defaultAddress.base58;
+		const balance = await window.tronWeb.trx.getBalance(address);
+		if (balance > unStakingFee) {
+			if (stakeContract) {
+				try {
+					// eslint-disable-next-line
+					const unStakeTx = await stakeContract
+						.unStakeNFT(tokenId)
+						.send({ from: stakeContractAddress, callValue: unStakingFee });
+					return { isSuccess: true, tokenId: tokenId };
+				} catch (error) {
+					return { isSuccess: false, error: error };
+				}
 			}
+		} else {
+			ToastErrMsg("Insufficient funds for unstaking!");
+			return { isSuccess: false };
 		}
 	} catch (error) {
 		console.log("error: ", error);
@@ -209,18 +213,21 @@ export const getMintedList = async () => {
 	let mintedList = [];
 	try {
 		const nftContract = await getNFTContract();
-
 		if (nftContract) {
 			try {
 				const balance = await nftContract
 					.balanceOf(window.tronWeb.defaultAddress.base58)
 					.call();
+				console.log("balance: ", balance.toString());
 				if (balance.toString()) {
 					for (let i = 0; i < balance.toString(); i++) {
 						try {
 							const mintedNFT = await nftContract
 								.tokenOfOwnerByIndex(window.tronWeb.defaultAddress.base58, i)
 								.call();
+							const tokenURI = await nftContract.tokenURI(1).call();
+							const metaData = await fetch(tokenURI);
+							console.log(metaData);
 							mintedList.push({ tokenId: mintedNFT.toString() });
 						} catch (error) {
 							console.log("error: ", error);
