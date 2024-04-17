@@ -212,6 +212,7 @@ export const claimNFT = async () => {
 };
 
 export const getMintedList = async () => {
+	console.log("Here!!!!!!!!!!!");
 	let mintedList = [];
 	try {
 		const nftContract = await getNFTContract();
@@ -220,6 +221,7 @@ export const getMintedList = async () => {
 				const balance = await nftContract
 					.balanceOf(window.tronWeb.defaultAddress.base58)
 					.call();
+				console.log("balance: ", balance);
 				if (balance.toString() !== 0) {
 					for (let i = 0; i < balance.toString(); i++) {
 						try {
