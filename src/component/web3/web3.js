@@ -235,9 +235,8 @@ export const getMintedList = async () => {
 									const response = await fetch(`${corsProxy}${tokenURI}`, {
 										method: "GET",
 										headers: {
+											"Access-Control-Allow-Origin": "*",
 											"Content-Type": "application/json",
-											// Other headers can go here, but not Access-Control-Allow-Origin
-											"Access-Control-Allow-Origin": projectURL,
 										},
 									});
 									if (!response.ok)
