@@ -39,7 +39,7 @@ const Claim = ({ address }) => {
 		setMinedAddress();
 		setAvailableToken();
 		// availableStakes();
-		if (address === ownerAddress) {
+		if (addressRef.current === ownerAddress) {
 			setIsOwner(true);
 		} else {
 			setIsOwner(false);
