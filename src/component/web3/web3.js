@@ -5,6 +5,7 @@ const FullNode = "https://api.trongrid.io";
 const SolidityNode = "https://api.trongrid.io";
 const EventServer = "https://api.trongrid.io";
 const privateKey = process.env.REACT_APP_PRIVATE_KEY;
+const projectURL = process.env.REACT_APP_PROJECT_URL;
 
 // Initialize TronWeb
 // const tronWeb = new TronWeb({
@@ -231,11 +232,17 @@ export const getMintedList = async () => {
 							if (tokenURI != null) {
 								const corsProxy = "https://thingproxy.freeboard.io/fetch/";
 								try {
-									const response = await fetch(`${corsProxy}${tokenURI}`);
+									const response = await fetch(`${corsProxy}${tokenURI}`, {
+										method: "GET",
+										headers: {
+											"Content-Type": "application/json",
+											// Other headers can go here, but not Access-Control-Allow-Origin
+											"Access-Control-Allow-Origin": projectURL,
+										},
+									});
 									if (!response.ok)
 										throw new Error("Network response was not ok.");
 									const data = await response.json();
-									console.log(data);
 									const nftImage = data.image;
 									const rarityData = data.attributes[7].value;
 									mintedList.push({
@@ -243,7 +250,6 @@ export const getMintedList = async () => {
 										nftImage,
 										rarityData,
 									});
-									console.log(mintedList);
 								} catch (error) {
 									console.error("Failed to fetch data:", error);
 								}
