@@ -212,7 +212,6 @@ export const claimNFT = async () => {
 };
 
 export const getMintedList = async () => {
-	console.log("Here!!!!!!!!!!!");
 	let mintedList = [];
 	try {
 		const nftContract = await getNFTContract();
@@ -221,40 +220,42 @@ export const getMintedList = async () => {
 				const balance = await nftContract
 					.balanceOf(window.tronWeb.defaultAddress.base58)
 					.call();
-				console.log("balance: ", balance);
 				if (balance.toString() !== 0) {
 					for (let i = 0; i < balance.toString(); i++) {
 						try {
 							const mintedNFT = await nftContract
 								.tokenOfOwnerByIndex(window.tronWeb.defaultAddress.base58, i)
 								.call();
-							const tokenURI = await nftContract
-								.tokenURI(mintedNFT.toString())
-								.call();
-							if (tokenURI != null) {
-								const corsProxy = "https://thingproxy.freeboard.io/fetch/";
-								try {
-									const response = await fetch(`${corsProxy}${tokenURI}`, {
-										method: "GET",
-										headers: {
-											"Access-Control-Allow-Origin": "*",
-											"Content-Type": "application/json",
-										},
-									});
-									if (!response.ok)
-										throw new Error("Network response was not ok.");
-									const data = await response.json();
-									const nftImage = data.image;
-									const rarityData = data.attributes[7].value;
-									mintedList.push({
-										tokenId: mintedNFT.toString(),
-										nftImage,
-										rarityData,
-									});
-								} catch (error) {
-									console.error("Failed to fetch data:", error);
-								}
+							if (mintedNFT) {
+								mintedList.push({ tokenId: mintedNFT.toString() });
 							}
+							// const tokenURI = await nftContract
+							// 	.tokenURI(mintedNFT.toString())
+							// 	.call();
+							// if (tokenURI != null) {
+							// 	const corsProxy = "https://thingproxy.freeboard.io/fetch/";
+							// 	try {
+							// 		const response = await fetch(`${corsProxy}${tokenURI}`, {
+							// 			method: "GET",
+							// 			headers: {
+							// 				"Access-Control-Allow-Origin": "*",
+							// 				"Content-Type": "application/json",
+							// 			},
+							// 		});
+							// 		if (!response.ok)
+							// 			throw new Error("Network response was not ok.");
+							// 		const data = await response.json();
+							// 		const nftImage = data.image;
+							// 		const rarityData = data.attributes[7].value;
+							// 		mintedList.push({
+							// 			tokenId: mintedNFT.toString(),
+							// 			nftImage,
+							// 			rarityData,
+							// 		});
+							// 	} catch (error) {
+							// 		console.error("Failed to fetch data:", error);
+							// 	}
+							// }
 						} catch (error) {
 							console.log("error: ", error);
 							return { isSuccess: false, error, mintedList: [] };

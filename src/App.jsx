@@ -46,7 +46,7 @@ function App() {
 		};
 
 		loadAccount();
-	}, [accountRef]);
+	}, [accountRef.current]);
 
 	return (
 		<div className="bg-black">
