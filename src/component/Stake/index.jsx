@@ -75,12 +75,12 @@ const Stake = () => {
 						<div className="d-flex stake-nft" key={index}>
 							<div className="d-flex flex-column justify-content-center align-items-center">
 								<img
-									src={Img_Minted}
+									src={item.nftImage}
 									className="img-nft"
 									alt="Minted NFT Img"
 								/>
 								<p className="nft-value">NFT ID # {item.tokenId}</p>
-								<p className="nft-value">Rarity Rank: 432</p>
+								<p className="nft-value">Rarity Rank: {item.rarityData}</p>
 							</div>
 							<div className="stake-collection d-flex flex-column justify-content-center align-items-center">
 								<p>You haven't staked this collection yet.</p>

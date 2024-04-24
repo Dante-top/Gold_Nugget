@@ -10,7 +10,6 @@ const Claim = ({ address }) => {
 	const [available, setAvailable] = useState(0);
 	const [isOwner, setIsOwner] = useState(false);
 	const [isClaiming, setIsClaiming] = useState(false);
-	const addressRef = useRef(address);
 	const ownersListRef = useRef(ownersList);
 
 	const handleClaim = useCallback(async () => {
@@ -39,13 +38,12 @@ const Claim = ({ address }) => {
 		setMinedAddress();
 		setAvailableToken();
 		// availableStakes();
-		console.log(address);
-		if (address === ownerAddress) {
+		if (window.tronWeb.defaultAddress.base58 === ownerAddress) {
 			setIsOwner(true);
 		} else {
 			setIsOwner(false);
 		}
-	}, [addressRef, ownersListRef]);
+	}, [ownersListRef]);
 
 	useEffect(() => {
 		const interval = setInterval(async () => {

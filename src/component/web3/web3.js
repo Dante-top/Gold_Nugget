@@ -5,7 +5,6 @@ const FullNode = "https://api.trongrid.io";
 const SolidityNode = "https://api.trongrid.io";
 const EventServer = "https://api.trongrid.io";
 const privateKey = process.env.REACT_APP_PRIVATE_KEY;
-const projectURL = process.env.REACT_APP_PROJECT_URL;
 
 // Initialize TronWeb
 // const tronWeb = new TronWeb({
@@ -227,35 +226,13 @@ export const getMintedList = async () => {
 								.tokenOfOwnerByIndex(window.tronWeb.defaultAddress.base58, i)
 								.call();
 							if (mintedNFT) {
-								mintedList.push({ tokenId: mintedNFT.toString() });
+								const metaData = await getMintedNFTData(mintedNFT.toString());
+								mintedList.push({
+									tokenId: metaData.tokenId,
+									nftImage: metaData.nftImage,
+									rarityData: metaData.rarityData,
+								});
 							}
-							// const tokenURI = await nftContract
-							// 	.tokenURI(mintedNFT.toString())
-							// 	.call();
-							// if (tokenURI != null) {
-							// 	const corsProxy = "https://thingproxy.freeboard.io/fetch/";
-							// 	try {
-							// 		const response = await fetch(`${corsProxy}${tokenURI}`, {
-							// 			method: "GET",
-							// 			headers: {
-							// 				"Access-Control-Allow-Origin": "*",
-							// 				"Content-Type": "application/json",
-							// 			},
-							// 		});
-							// 		if (!response.ok)
-							// 			throw new Error("Network response was not ok.");
-							// 		const data = await response.json();
-							// 		const nftImage = data.image;
-							// 		const rarityData = data.attributes[7].value;
-							// 		mintedList.push({
-							// 			tokenId: mintedNFT.toString(),
-							// 			nftImage,
-							// 			rarityData,
-							// 		});
-							// 	} catch (error) {
-							// 		console.error("Failed to fetch data:", error);
-							// 	}
-							// }
 						} catch (error) {
 							console.log("error: ", error);
 							return { isSuccess: false, error, mintedList: [] };
@@ -294,8 +271,11 @@ export const getStakingList = async () => {
 							const stakedId = stakedNFTData.tokenId.toString();
 							const stakedTime = stakedNFTData.startTime.toString();
 							const formattedTime = convertTimestampToCustomFormat(stakedTime);
+							const nftMetadata = await getMintedNFTData(stakedId);
 							stakingList.push({
 								stakedId,
+								nftImage: nftMetadata.nftImage,
+								rarityData: nftMetadata.rarityData,
 								date: formattedTime.formattedDate,
 								time: formattedTime.formattedTime,
 							});
@@ -314,6 +294,34 @@ export const getStakingList = async () => {
 	} catch (error) {
 		return { isSuccess: false, error, stakingList: [] };
 	}
+};
+
+const getMintedNFTData = async (tokenId) => {
+	try {
+		const nftContract = await getNFTContract();
+		if (nftContract) {
+			const tokenURI = await nftContract.tokenURI(tokenId).call();
+			if (tokenURI != null) {
+				const corsProxy = "https://thingproxy.freeboard.io/fetch/";
+				try {
+					const response = await fetch(`${corsProxy}${tokenURI}`, {
+						method: "GET",
+						headers: {
+							"Access-Control-Allow-Origin": "*",
+							"Content-Type": "application/json",
+						},
+					});
+					if (!response.ok) throw new Error("Network response was not ok.");
+					const data = await response.json();
+					const nftImage = data.image;
+					const rarityData = data.attributes[7].value;
+					return { tokenId, nftImage, rarityData };
+				} catch (error) {
+					console.error("Failed to fetch data:", error);
+				}
+			}
+		}
+	} catch (error) {}
 };
 
 export const getAvailableStake = async () => {
