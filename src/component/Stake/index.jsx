@@ -31,7 +31,6 @@ const Stake = () => {
 				try {
 					await axios.get(item.tokenURI).then(async (response) => {
 						const jsonResponse = response.data;
-						console.log("metadata: ", jsonResponse);
 						const nftImage = jsonResponse.image;
 						const rarityData = jsonResponse.attributes[7].value;
 						stakeList.push({
@@ -56,7 +55,6 @@ const Stake = () => {
 				try {
 					await axios.get(item.tokenURI).then(async (response) => {
 						const jsonResponse = response.data;
-						console.log("metadata: ", jsonResponse);
 						const nftImage = jsonResponse.image;
 						const rarityData = jsonResponse.attributes[7].value;
 						mintList.push({

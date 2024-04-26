@@ -230,8 +230,6 @@ export const getMintedList = async () => {
 								mintedList.push({
 									tokenId: metaData.tokenId,
 									tokenURI: metaData.tokenURI,
-									// nftImage: metaData.nftImage,
-									// rarityData: metaData.rarityData,
 								});
 							}
 						} catch (error) {
