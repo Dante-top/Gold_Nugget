@@ -72,6 +72,8 @@ export const getAvailableToken = async () => {
 			} catch (error) {
 				return { isSuccess: false, balance: 0 };
 			}
+		} else {
+			return { isSuccess: false };
 		}
 	} catch (error) {
 		return { isSuccess: false, balance: 0 };
@@ -108,6 +110,8 @@ export const getOwnersAddress = async () => {
 			} catch (error) {
 				return { isSuccess: false, error: error };
 			}
+		} else {
+			return { isSuccess: false };
 		}
 	} catch (error) {
 		return { isSuccess: false, error: error };
@@ -145,6 +149,8 @@ export const stakeNFT = async (tokenId) => {
 				console.log("error: ", error);
 				return { isSuccess: false, error: error };
 			}
+		} else {
+			return { isSuccess: false };
 		}
 	} catch (error) {
 		return { isSuccess: false, error: error };
@@ -243,6 +249,8 @@ export const getMintedList = async () => {
 				console.log("error: ", error);
 				return { isSuccess: false, error, mintedList: [] };
 			}
+		} else {
+			return { isSuccess: false, mintedList: [] };
 		}
 	} catch (error) {
 		return { isSuccess: false, error, mintedList: [] };
@@ -288,6 +296,8 @@ export const getStakingList = async () => {
 			} catch (error) {
 				console.log("error: ", error);
 			}
+		} else {
+			return { isSuccess: false, stakingList: [] };
 		}
 	} catch (error) {
 		return { isSuccess: false, error, stakingList: [] };
@@ -303,7 +313,9 @@ const getMintedNFTData = async (tokenId) => {
 				return { tokenId, tokenURI };
 			}
 		}
-	} catch (error) {}
+	} catch (error) {
+		return;
+	}
 };
 
 export const getAvailableStake = async () => {

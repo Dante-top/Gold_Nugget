@@ -107,7 +107,7 @@ const Stake = () => {
 					</div>
 				</div>
 				<div className="stake-main-content d-flex flex-column">
-					{mintedData.map((item, index) => (
+					{mintedData?.map((item, index) => (
 						<div className="d-flex stake-nft" key={index}>
 							<div className="d-flex flex-column justify-content-center align-items-center">
 								<img
@@ -138,7 +138,7 @@ const Stake = () => {
 						</div>
 					))}
 					<hr className="divide-line" />
-					{stakedData.map((item, index) => (
+					{stakedData?.map((item, index) => (
 						<div
 							className="d-flex staked-nft justify-content-between"
 							key={index}

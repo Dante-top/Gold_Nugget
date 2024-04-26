@@ -60,8 +60,6 @@ const Claim = ({ address }) => {
 		const resData = await getOwnersAddress();
 		if (resData.isSuccess) {
 			setOwnersList(resData.ownersList);
-		} else {
-			console.log("error: ", resData.error);
 		}
 	};
 

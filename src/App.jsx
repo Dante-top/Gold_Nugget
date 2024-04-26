@@ -23,25 +23,27 @@ function App() {
 	// Request Account Access
 	const getAccount = async () => {
 		// Use useCallback to memoize
-		if (detectTronLink()) {
-			try {
-				const tronWeb = window.tronWeb;
-				const accounts = await tronWeb.request({
-					method: "tron_requestAccounts",
-				});
-				if (window.tronWeb.fullNode.host !== "https://api.trongrid.io") {
-					ToastErrMsg(
-						"You need to set your Tronlink wallet to Tron Mainnet! Please change the network and refresh."
-					);
+		if (window) {
+			if (detectTronLink()) {
+				try {
+					const tronWeb = window.tronWeb;
+					const accounts = await tronWeb.request({
+						method: "tron_requestAccounts",
+					});
+					if (window.tronWeb.fullNode.host !== "https://api.trongrid.io") {
+						ToastErrMsg(
+							"You need to set your Tronlink wallet to Tron Mainnet! Please change the network and refresh."
+						);
+					}
+					return accounts[0]; // The first account is usually the user's primary account.
+				} catch (error) {
+					console.error("Error accessing account:", error);
 				}
-				return accounts[0]; // The first account is usually the user's primary account.
-			} catch (error) {
-				console.error("Error accessing account:", error);
+			} else {
+				ToastErrMsg(
+					"TronLink is not installed. Please install TronLink to interact with the app."
+				);
 			}
-		} else {
-			ToastErrMsg(
-				"TronLink is not installed. Please install TronLink to interact with the app."
-			);
 		}
 	}; // Include detectTronLink as a dependency
 
@@ -52,7 +54,7 @@ function App() {
 		};
 
 		loadAccount();
-	}, [accountRef.current]);
+	}, []);
 
 	return (
 		<div className="bg-black">
