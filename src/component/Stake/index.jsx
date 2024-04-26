@@ -8,6 +8,7 @@ import {
 	unStakeNFT,
 } from "../web3/web3";
 import { ToastErrMsg, ToastSuccessMsg } from "../Toast";
+import axios from "axios";
 
 const Stake = () => {
 	const [stakedData, setStakedData] = useState([]);
@@ -15,23 +16,60 @@ const Stake = () => {
 	const [isStaking, setIsStaking] = useState(false);
 	const [isUnStaking, setIsUnStaking] = useState({});
 	const stakedDataRef = useRef(stakedData);
+	const mintedDataRef = useRef(mintedData);
 
 	useEffect(() => {
 		setStakedNFTData();
 		setMintedNFTData();
-	}, [stakedDataRef]);
+	}, [stakedDataRef, mintedDataRef]);
 
 	const setStakedNFTData = async () => {
+		let stakeList = [];
 		const resData = await getStakingList();
 		if (resData) {
-			setStakedData(resData.stakingList);
+			resData.stakingList.map(async (item) => {
+				try {
+					await axios.get(item.tokenURI).then(async (response) => {
+						const jsonResponse = response.data;
+						console.log("metadata: ", jsonResponse);
+						const nftImage = jsonResponse.image;
+						const rarityData = jsonResponse.attributes[7].value;
+						stakeList.push({
+							tokenId: item.tokenId,
+							nftImage,
+							rarityData,
+						});
+						setStakedData(stakeList);
+					});
+				} catch (error) {
+					console.error("Failed to fetch data:", error);
+				}
+			});
 		}
 	};
 
 	const setMintedNFTData = async () => {
+		let mintList = [];
 		const resData = await getMintedList();
 		if (resData) {
-			setMintedData(resData.mintedList);
+			resData.mintedList.map(async (item) => {
+				try {
+					await axios.get(item.tokenURI).then(async (response) => {
+						const jsonResponse = response.data;
+						console.log("metadata: ", jsonResponse);
+						const nftImage = jsonResponse.image;
+						const rarityData = jsonResponse.attributes[7].value;
+						mintList.push({
+							tokenId: item.tokenId,
+							nftImage,
+							rarityData,
+						});
+						setMintedData(mintList);
+					});
+				} catch (error) {
+					console.error("Failed to fetch data:", error);
+				}
+			});
 		}
 	};
 

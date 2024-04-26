@@ -229,8 +229,9 @@ export const getMintedList = async () => {
 								const metaData = await getMintedNFTData(mintedNFT.toString());
 								mintedList.push({
 									tokenId: metaData.tokenId,
-									nftImage: metaData.nftImage,
-									rarityData: metaData.rarityData,
+									tokenURI: metaData.tokenURI,
+									// nftImage: metaData.nftImage,
+									// rarityData: metaData.rarityData,
 								});
 							}
 						} catch (error) {
@@ -274,8 +275,7 @@ export const getStakingList = async () => {
 							const nftMetadata = await getMintedNFTData(stakedId);
 							stakingList.push({
 								stakedId,
-								nftImage: nftMetadata.nftImage,
-								rarityData: nftMetadata.rarityData,
+								tokenURI: nftMetadata.tokenURI,
 								date: formattedTime.formattedDate,
 								time: formattedTime.formattedTime,
 							});
@@ -302,23 +302,7 @@ const getMintedNFTData = async (tokenId) => {
 		if (nftContract) {
 			const tokenURI = await nftContract.tokenURI(tokenId).call();
 			if (tokenURI != null) {
-				const corsProxy = "https://thingproxy.freeboard.io/fetch/";
-				try {
-					const response = await fetch(`${corsProxy}${tokenURI}`, {
-						method: "GET",
-						headers: {
-							"Access-Control-Allow-Origin": "*",
-							"Content-Type": "application/json",
-						},
-					});
-					if (!response.ok) throw new Error("Network response was not ok.");
-					const data = await response.json();
-					const nftImage = data.image;
-					const rarityData = data.attributes[7].value;
-					return { tokenId, nftImage, rarityData };
-				} catch (error) {
-					console.error("Failed to fetch data:", error);
-				}
+				return { tokenId, tokenURI };
 			}
 		}
 	} catch (error) {}
