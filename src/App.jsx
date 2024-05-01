@@ -16,7 +16,6 @@ function App() {
 	const detectTronLink = () => {
 		// Use useCallback to memoize
 		const { tronWeb } = window;
-		console.log("network: ", window.tronWeb.fullNode.host);
 		return tronWeb && tronWeb.ready;
 	}; // No dependencies, so it only creates the function once
 
@@ -27,7 +26,7 @@ function App() {
 			if (detectTronLink()) {
 				try {
 					const tronWeb = window.tronWeb;
-					const accounts = await tronWeb.request({
+					await tronWeb.request({
 						method: "tron_requestAccounts",
 					});
 					if (window.tronWeb.fullNode.host !== "https://api.trongrid.io") {
@@ -35,13 +34,13 @@ function App() {
 							"You need to set your Tronlink wallet to Tron Mainnet! Please change the network and refresh."
 						);
 					}
-					return accounts[0]; // The first account is usually the user's primary account.
+					return; // The first account is usually the user's primary account.
 				} catch (error) {
 					console.error("Error accessing account:", error);
 				}
 			} else {
 				ToastErrMsg(
-					"TronLink is not installed. Please install TronLink to interact with the app."
+					"TronLink is not installed or locked now. Please install or unlock your TronLink to interact with the app."
 				);
 			}
 		}
@@ -50,7 +49,11 @@ function App() {
 	useEffect(() => {
 		const loadAccount = async () => {
 			await getAccount();
-			setAccount(window.tronWeb.defaultAddress.base58);
+			const newAccount = window.tronWeb.defaultAddress.base58;
+			if (newAccount !== accountRef.current) {
+				setAccount(newAccount);
+				accountRef.current = newAccount; // Update ref
+			}
 		};
 
 		loadAccount();

@@ -5,6 +5,7 @@ import { useState } from "react";
 
 const Navbar = ({ address }) => {
 	const [wallet, setWallet] = useState("");
+
 	const handleConnectWallet = async () => {
 		try {
 			const tronWeb = window.tronWeb;
@@ -40,7 +41,7 @@ const Navbar = ({ address }) => {
 						<FontAwesomeIcon icon={faTelegram} />
 					</a>
 				</div>
-				{address === "" ? (
+				{address === "" || !address ? (
 					<>
 						{wallet === "" ? (
 							<button
