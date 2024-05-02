@@ -2,19 +2,26 @@ import "./index.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTelegram, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { useState } from "react";
+import { ToastErrMsg } from "../Toast";
 
-const Navbar = ({ address }) => {
+const Navbar = ({ tronLinkStatus, address }) => {
 	const [wallet, setWallet] = useState("");
 
 	const handleConnectWallet = async () => {
-		try {
-			const tronWeb = window.tronWeb;
-			await tronWeb.request({
-				method: "tron_requestAccounts",
-			});
-			setWallet(window.tronWeb.defaultAddress.base58); // The first account is usually the user's primary account.
-		} catch (error) {
-			console.error("Error accessing account:", error);
+		if (tronLinkStatus.installed && tronLinkStatus.unlocked) {
+			try {
+				const tronWeb = window.tronWeb;
+				await tronWeb.request({
+					method: "tron_requestAccounts",
+				});
+				setWallet(window.tronWeb.defaultAddress.base58); // The first account is usually the user's primary account.
+			} catch (error) {
+				console.error("Error accessing account:", error);
+			}
+		} else {
+			ToastErrMsg(
+				"TronLink is not installed or locked now. Please install or unlock your TronLink to interact with the app."
+			);
 		}
 	};
 	return (

@@ -5,7 +5,7 @@ import Countdown from "react-countdown";
 import { ToastErrMsg, ToastSuccessMsg } from "../Toast";
 const ownerAddress = process.env.REACT_APP_OWNER_ADDRESS || "";
 
-const Claim = ({ address }) => {
+const Claim = ({ tronLinkStatus, address }) => {
 	const [ownersList, setOwnersList] = useState([]);
 	const [available, setAvailable] = useState(0);
 	const [isOwner, setIsOwner] = useState(false);
@@ -35,15 +35,17 @@ const Claim = ({ address }) => {
 	}, [isOwner]);
 
 	useEffect(() => {
-		setMinedAddress();
-		setAvailableToken();
-		// availableStakes();
-		if (window.tronWeb.defaultAddress.base58 === ownerAddress) {
-			setIsOwner(true);
-		} else {
-			setIsOwner(false);
+		if (tronLinkStatus.installed && tronLinkStatus.unlocked) {
+			setMinedAddress();
+			setAvailableToken();
+			// availableStakes();
+			if (window.tronWeb.defaultAddress.base58 === ownerAddress) {
+				setIsOwner(true);
+			} else {
+				setIsOwner(false);
+			}
 		}
-	}, [ownersListRef]);
+	}, [ownersListRef, tronLinkStatus]);
 
 	useEffect(() => {
 		const interval = setInterval(async () => {

@@ -1,10 +1,12 @@
 import TronWeb from "tronweb";
 import { ToastErrMsg } from "../Toast";
+import axios from "axios";
 
 const FullNode = "https://api.trongrid.io";
 const SolidityNode = "https://api.trongrid.io";
 const EventServer = "https://api.trongrid.io";
 const privateKey = process.env.REACT_APP_PRIVATE_KEY;
+const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 // Initialize TronWeb
 // const tronWeb = new TronWeb({
@@ -235,7 +237,8 @@ export const getMintedList = async () => {
 								const metaData = await getMintedNFTData(mintedNFT.toString());
 								mintedList.push({
 									tokenId: metaData.tokenId,
-									tokenURI: metaData.tokenURI,
+									nftImage: metaData.nftImage,
+									rarityData: metaData.rarityData,
 								});
 							}
 						} catch (error) {
@@ -281,7 +284,8 @@ export const getStakingList = async () => {
 							const nftMetadata = await getMintedNFTData(stakedId);
 							stakingList.push({
 								stakedId,
-								tokenURI: nftMetadata.tokenURI,
+								nftImage: nftMetadata.nftImage,
+								rarityData: nftMetadata.rarityData,
 								date: formattedTime.formattedDate,
 								time: formattedTime.formattedTime,
 							});
@@ -305,12 +309,29 @@ export const getStakingList = async () => {
 };
 
 const getMintedNFTData = async (tokenId) => {
+	let jsonResponse = {};
 	try {
 		const nftContract = await getNFTContract();
 		if (nftContract) {
 			const tokenURI = await nftContract.tokenURI(tokenId).call();
 			if (tokenURI != null) {
-				return { tokenId, tokenURI };
+				await axios
+					.get(`${SERVER_URL}getNFTData`, {
+						params: {
+							tokenURI: tokenURI,
+						},
+						headers: {
+							"Content-Type": "application/x-www-form-urlencoded",
+						},
+					})
+					.then(async (response) => {
+						jsonResponse = response.data;
+					});
+				return {
+					tokenId: tokenId,
+					nftImage: jsonResponse.image,
+					rarityData: jsonResponse.attributes[7].value,
+				};
 			}
 		}
 	} catch (error) {

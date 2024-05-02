@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -11,53 +11,63 @@ import { ToastErrMsg } from "./component/Toast";
 
 function App() {
 	const [account, setAccount] = useState("");
-	const accountRef = useRef(account);
-	// Detect TronLink
-	const detectTronLink = () => {
-		// Use useCallback to memoize
-		const { tronWeb } = window;
-		return tronWeb && tronWeb.ready;
-	}; // No dependencies, so it only creates the function once
 
-	// Request Account Access
-	const getAccount = async () => {
-		// Use useCallback to memoize
-		if (window) {
-			if (detectTronLink()) {
-				try {
-					const tronWeb = window.tronWeb;
-					await tronWeb.request({
-						method: "tron_requestAccounts",
-					});
-					if (window.tronWeb.fullNode.host !== "https://api.trongrid.io") {
-						ToastErrMsg(
-							"You need to set your Tronlink wallet to Tron Mainnet! Please change the network and refresh."
-						);
-					}
-					return; // The first account is usually the user's primary account.
-				} catch (error) {
-					console.error("Error accessing account:", error);
+	const [tronLinkStatus, setTronLinkStatus] = useState({
+		installed: false,
+		unlocked: false,
+	});
+
+	// Function to wait for TronWeb to be injected
+	const waitForTronWeb = (callback, timeout = 3000, interval = 100) => {
+		const check = async () => {
+			if (window.tronWeb && window.tronWeb.ready) {
+				await window.tronWeb.request({
+					method: "tron_requestAccounts",
+				});
+				if (window.tronWeb.fullNode.host !== "https://api.trongrid.io") {
+					ToastErrMsg(
+						"You need to set your Tronlink wallet to Tron Mainnet! Please change the network and refresh."
+					);
 				}
+				callback(true); // TronWeb is ready
+			} else if (timeout <= 0) {
+				callback(false); // Timeout reached
 			} else {
-				ToastErrMsg(
-					"TronLink is not installed or locked now. Please install or unlock your TronLink to interact with the app."
-				);
-			}
-		}
-	}; // Include detectTronLink as a dependency
-
-	useEffect(() => {
-		const loadAccount = async () => {
-			await getAccount();
-			const newAccount = window.tronWeb.defaultAddress.base58;
-			if (newAccount !== accountRef.current) {
-				setAccount(newAccount);
-				accountRef.current = newAccount; // Update ref
+				setTimeout(check, interval);
+				timeout -= interval; // Decrement the timeout
 			}
 		};
+		check();
+	};
 
-		loadAccount();
-	}, []);
+	useEffect(() => {
+		waitForTronWeb((isReady) => {
+			if (isReady) {
+				setTronLinkStatus({
+					installed: true,
+					unlocked: window.tronWeb.ready,
+				});
+			} else {
+				ToastErrMsg(
+					"TronLink is not installed now. Please install TronLink to interact with the app."
+				);
+				setTronLinkStatus({
+					installed: false,
+					unlocked: false,
+				});
+			}
+		});
+	}, [account]);
+
+	useEffect(() => {
+		if (tronLinkStatus.installed && tronLinkStatus.unlocked) {
+			setAccount(window.tronWeb.defaultAddress.base58);
+		} else if (tronLinkStatus.installed && !tronLinkStatus.unlocked) {
+			ToastErrMsg(
+				"TronLink is not locked now. Please unlock your TronLink to interact with the app."
+			);
+		}
+	}, [tronLinkStatus]);
 
 	return (
 		<div className="bg-black">
@@ -72,8 +82,8 @@ function App() {
 				draggable
 				pauseOnHover
 			/>
-			<Navbar address={account} />
-			<Claim address={account} />
+			<Navbar tronLinkStatus={tronLinkStatus} address={account} />
+			<Claim tronLinkStatus={tronLinkStatus} address={account} />
 			<Faq />
 			<Stake address={account} />
 		</div>
