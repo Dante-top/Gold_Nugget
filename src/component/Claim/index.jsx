@@ -53,7 +53,7 @@ const Claim = ({ tronLinkStatus, address }) => {
 				// Check if not already claiming to avoid overlapping calls
 				await handleClaim();
 			}
-		}, 60000); // 1 minutes
+		}, 6000000); // 1 minutes
 
 		return () => clearInterval(interval); // Cleanup interval on component unmount
 	}, [isClaiming, handleClaim]); // Depend on isClaiming to ensure the latest state is useds

@@ -1,29 +1,75 @@
 import "./index.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTelegram, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ToastErrMsg } from "../Toast";
 
-const Navbar = ({ tronLinkStatus, address }) => {
+const Navbar = ({ setAccount, address }) => {
 	const [wallet, setWallet] = useState("");
 
-	const handleConnectWallet = async () => {
-		if (tronLinkStatus.installed && tronLinkStatus.unlocked) {
-			try {
-				const tronWeb = window.tronWeb;
-				await tronWeb.request({
-					method: "tron_requestAccounts",
-				});
-				setWallet(window.tronWeb.defaultAddress.base58); // The first account is usually the user's primary account.
-			} catch (error) {
-				console.error("Error accessing account:", error);
+	const [tronLinkStatus, setTronLinkStatus] = useState({
+		installed: false,
+		unlocked: false,
+	});
+
+	// Function to wait for TronWeb to be injected
+	const waitForTronWeb = (callback, timeout = 3000, interval = 100) => {
+		const check = async () => {
+			if (window.tronWeb && window.tronWeb.ready) {
+				try {
+					// await window.tronWeb.request({
+					// 	method: "tron_requestAccounts",
+					// });
+					if (window.tronWeb.fullNode.host !== "https://api.trongrid.io") {
+						ToastErrMsg(
+							"You need to set your Tronlink wallet to Tron Mainnet! Please change the network and refresh."
+						);
+					}
+					callback(true); // TronWeb is ready
+				} catch (error) {
+					console.log("Connection request failed: ", error);
+				}
+			} else if (timeout <= 0) {
+				callback(false); // Timeout reached
+			} else {
+				setTimeout(check, interval);
+				timeout -= interval; // Decrement the timeout
 			}
-		} else {
+		};
+		check();
+	};
+
+	const handleConnectWallet = () => {
+		waitForTronWeb((isReady) => {
+			if (isReady) {
+				setTronLinkStatus({
+					installed: true,
+					unlocked: window.tronWeb.ready,
+				});
+				const newWalletAddress = window.tronWeb.defaultAddress.base58;
+				setAccount(newWalletAddress);
+			} else {
+				ToastErrMsg(
+					"TronLink is not installed now. Please install TronLink to interact with the app."
+				);
+				setTronLinkStatus({
+					installed: false,
+					unlocked: false,
+				});
+			}
+		});
+	};
+
+	useEffect(() => {
+		if (tronLinkStatus.installed && tronLinkStatus.unlocked) {
+			setWallet(window.tronWeb.defaultAddress.base58);
+		} else if (tronLinkStatus.installed && !tronLinkStatus.unlocked) {
 			ToastErrMsg(
-				"TronLink is not installed or locked now. Please install or unlock your TronLink to interact with the app."
+				"TronLink is locked now. Please unlock your TronLink to interact with the app."
 			);
 		}
-	};
+	}, [tronLinkStatus]);
+
 	return (
 		<nav className="navbar navbar-dark navbar-expand-sm bg-dark p-3 align-items-center">
 			<a

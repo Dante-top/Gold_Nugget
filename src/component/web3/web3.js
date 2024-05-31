@@ -218,20 +218,18 @@ export const claimNFT = async () => {
 	}
 };
 
-export const getMintedList = async () => {
+export const getMintedList = async (walletAddress) => {
 	let mintedList = [];
 	try {
 		const nftContract = await getNFTContract();
 		if (nftContract) {
 			try {
-				const balance = await nftContract
-					.balanceOf(window.tronWeb.defaultAddress.base58)
-					.call();
-				if (balance.toString() !== 0) {
+				const balance = await nftContract.balanceOf(walletAddress).call();
+				if (balance.toString() !== "0") {
 					for (let i = 0; i < balance.toString(); i++) {
 						try {
 							const mintedNFT = await nftContract
-								.tokenOfOwnerByIndex(window.tronWeb.defaultAddress.base58, i)
+								.tokenOfOwnerByIndex(walletAddress, i)
 								.call();
 							if (mintedNFT) {
 								const metaData = await getMintedNFTData(mintedNFT.toString());
@@ -249,7 +247,7 @@ export const getMintedList = async () => {
 					return { isSuccess: true, mintedList };
 				}
 			} catch (error) {
-				console.log("error: ", error);
+				console.log("error2: ", error);
 				return { isSuccess: false, error, mintedList: [] };
 			}
 		} else {
@@ -260,20 +258,20 @@ export const getMintedList = async () => {
 	}
 };
 
-export const getStakingList = async () => {
+export const getStakingList = async (walletAddress) => {
 	let stakingList = [];
 	try {
 		const stakingContract = await getStakeContract();
 		if (stakingContract) {
 			try {
 				const stakedTokenIdLength = await stakingContract
-					.stakingBalance(window.tronWeb.defaultAddress.base58)
+					.stakingBalance(walletAddress)
 					.call();
-				if (stakedTokenIdLength.toString() !== 0) {
+				if (stakedTokenIdLength.toString() !== "0") {
 					for (let i = 0; i < stakedTokenIdLength.toString(); i++) {
 						try {
 							const stakedTokenIds = await stakingContract
-								.tokenIdbyOwners(window.tronWeb.defaultAddress.base58, i)
+								.tokenIdbyOwners(walletAddress, i)
 								.call();
 							const stakedNFTData = await stakingContract
 								.stakings(stakedTokenIds.toString())
@@ -298,7 +296,8 @@ export const getStakingList = async () => {
 					return { isSuccess: false, stakingList: [] };
 				}
 			} catch (error) {
-				console.log("error: ", error);
+				console.log("error3: ", error);
+				return { isSuccess: false, stakingList: [] };
 			}
 		} else {
 			return { isSuccess: false, stakingList: [] };
@@ -322,6 +321,7 @@ const getMintedNFTData = async (tokenId) => {
 						},
 						headers: {
 							"Content-Type": "application/x-www-form-urlencoded",
+							"Access-Control-Allow-Origin": "*",
 						},
 					})
 					.then(async (response) => {
@@ -353,7 +353,7 @@ export const getAvailableStake = async () => {
 					return { isSuccess: false };
 				}
 			} catch (error) {
-				console.log("error: ", error);
+				console.log("error4: ", error);
 				return { isSuccess: false };
 			}
 		} else {
