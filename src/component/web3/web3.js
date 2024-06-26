@@ -70,6 +70,8 @@ export const getAvailableToken = async () => {
 					.call();
 				if (balance) {
 					return { isSuccess: true, balance: balance.toString() };
+				} else {
+					return { isSuccess: false, balance: 0 };
 				}
 			} catch (error) {
 				return { isSuccess: false, balance: 0 };
@@ -218,15 +220,20 @@ export const claimNFT = async () => {
 	}
 };
 
-export const getMintedList = async (walletAddress) => {
+export const getMintedList = async (walletAddress, limitItems) => {
 	let mintedList = [];
 	try {
 		const nftContract = await getNFTContract();
 		if (nftContract) {
 			try {
 				const balance = await nftContract.balanceOf(walletAddress).call();
-				if (balance.toString() !== "0") {
-					for (let i = 0; i < balance.toString(); i++) {
+				const countItem = balance.toString();
+				if (countItem !== "0") {
+					for (
+						let i = limitItems - 5;
+						i < (countItem < limitItems ? countItem : limitItems);
+						i++
+					) {
 						try {
 							const mintedNFT = await nftContract
 								.tokenOfOwnerByIndex(walletAddress, i)
@@ -240,25 +247,25 @@ export const getMintedList = async (walletAddress) => {
 								});
 							}
 						} catch (error) {
-							console.log("error: ", error);
-							return { isSuccess: false, error, mintedList: [] };
+							return { isSuccess: false, error, mintedList: [], countItem: 0 };
 						}
 					}
-					return { isSuccess: true, mintedList };
+					return { isSuccess: true, mintedList, countItem };
+				} else {
+					return { isSuccess: false, mintedList: [], countItem: 0 };
 				}
 			} catch (error) {
-				console.log("error2: ", error);
-				return { isSuccess: false, error, mintedList: [] };
+				return { isSuccess: false, error, mintedList: [], countItem: 0 };
 			}
 		} else {
-			return { isSuccess: false, mintedList: [] };
+			return { isSuccess: false, mintedList: [], countItem: 0 };
 		}
 	} catch (error) {
-		return { isSuccess: false, error, mintedList: [] };
+		return { isSuccess: false, error, mintedList: [], countItem: 0 };
 	}
 };
 
-export const getStakingList = async (walletAddress) => {
+export const getStakingList = async (walletAddress, limitItems) => {
 	let stakingList = [];
 	try {
 		const stakingContract = await getStakeContract();
@@ -267,8 +274,13 @@ export const getStakingList = async (walletAddress) => {
 				const stakedTokenIdLength = await stakingContract
 					.stakingBalance(walletAddress)
 					.call();
-				if (stakedTokenIdLength.toString() !== "0") {
-					for (let i = 0; i < stakedTokenIdLength.toString(); i++) {
+				const countItem = stakedTokenIdLength.toString();
+				if (countItem !== "0") {
+					for (
+						let i = limitItems - 5;
+						i < (countItem < limitItems ? countItem : limitItems);
+						i++
+					) {
 						try {
 							const stakedTokenIds = await stakingContract
 								.tokenIdbyOwners(walletAddress, i)
@@ -288,22 +300,21 @@ export const getStakingList = async (walletAddress) => {
 								time: formattedTime.formattedTime,
 							});
 						} catch (error) {
-							return { isSuccess: false, error, stakingList: [] };
+							return { isSuccess: false, error, stakingList: [], countItem: 0 };
 						}
 					}
-					return { isSuccess: true, stakingList };
+					return { isSuccess: true, stakingList, countItem };
 				} else {
-					return { isSuccess: false, stakingList: [] };
+					return { isSuccess: false, stakingList: [], countItem: 0 };
 				}
 			} catch (error) {
-				console.log("error3: ", error);
-				return { isSuccess: false, stakingList: [] };
+				return { isSuccess: false, stakingList: [], countItem: 0 };
 			}
 		} else {
-			return { isSuccess: false, stakingList: [] };
+			return { isSuccess: false, stakingList: [], countItem: 0 };
 		}
 	} catch (error) {
-		return { isSuccess: false, error, stakingList: [] };
+		return { isSuccess: false, error, stakingList: [], countItem: 0 };
 	}
 };
 
@@ -353,7 +364,6 @@ export const getAvailableStake = async () => {
 					return { isSuccess: false };
 				}
 			} catch (error) {
-				console.log("error4: ", error);
 				return { isSuccess: false };
 			}
 		} else {

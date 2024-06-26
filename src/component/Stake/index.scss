@@ -86,6 +86,19 @@
 		width: 100px;
 		height: 100px;
 	}
+	.btn-load-more {
+		width: fit-content;
+		padding: 10px 19px;
+		border: none;
+		border-radius: 8px;
+		background-color: #6164ff;
+		color: white;
+		text-align: center;
+		font-size: 18px;
+	}
+	.btn-load-more:hover {
+		background-color: #5758a8;
+	}
 }
 
 @media (max-width: 575px) {
