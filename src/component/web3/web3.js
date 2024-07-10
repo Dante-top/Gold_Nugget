@@ -59,6 +59,24 @@ const getStakeContract = async () => {
 	}
 };
 
+const getStakeContractForClaim = async () => {
+	if (window) {
+		try {
+			const tronWeb = new TronWeb(
+				FullNode,
+				SolidityNode,
+				EventServer,
+				privateKey
+			);
+			if (tronWeb && tronWeb.defaultAddress.base58) {
+				console.log("address: ", tronWeb.defaultAddress.base58);
+				const stakeContract = await tronWeb.contract().at(stakeContractAddress);
+				return stakeContract;
+			}
+		} catch (error) {}
+	}
+};
+
 export const getAvailableToken = async () => {
 	let balance = 0;
 	try {
@@ -191,32 +209,30 @@ export const unStakeNFT = async (tokenId) => {
 };
 
 export const claimNFT = async () => {
-	const tronWeb = new TronWeb(FullNode, SolidityNode, EventServer, privateKey);
-
-	if (tronWeb && tronWeb.defaultAddress.base58) {
-		try {
-			const stakeContract = await tronWeb.contract().at(stakeContractAddress);
-			if (stakeContract) {
-				try {
-					const claimTX = await stakeContract
-						.claimNFT()
-						.send({ from: stakeContractAddress, callValue: 0 });
-					if (claimTX) {
-						return { isSuccess: true };
-					} else {
-						return { isSuccess: false };
-					}
-				} catch (error) {
-					if (error.message) {
-						return { isSuccess: false, error: error.message };
-					} else {
-						return { isSuccess: false };
-					}
+	try {
+		const stakeContract = await getStakeContractForClaim();
+		if (stakeContract) {
+			try {
+				const claimTX = await stakeContract.claimNFT().send({
+					from: stakeContractAddress,
+					callValue: 0,
+					feeLimit: 1000000000,
+				});
+				if (claimTX) {
+					return { isSuccess: true };
+				} else {
+					return { isSuccess: false };
+				}
+			} catch (error) {
+				if (error.message) {
+					return { isSuccess: false, error: error.message };
+				} else {
+					return { isSuccess: false };
 				}
 			}
-		} catch (error) {
-			return { isSuccess: false };
 		}
+	} catch (error) {
+		return { isSuccess: false };
 	}
 };
 
