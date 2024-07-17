@@ -1,5 +1,5 @@
 import "./index.scss";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getMintedList, getStakingList } from "../web3/web3";
 import MintedCard from "../MintedCard";
 import StakedCard from "../StakedCard";
@@ -16,8 +16,6 @@ const Stake = ({ tronLinkStatus, address }) => {
 	const [stakedCardList, setStakedCardList] = useState([]);
 	const [totalStaked, setTotalStaked] = useState(0);
 	const [totalMinted, setTotalMinted] = useState(0);
-	const mintedCardListRef = useRef(mintedCardList);
-	const stakedCardListRef = useRef(stakedCardList);
 
 	useEffect(() => {
 		if (tronLinkStatus.installed && tronLinkStatus.unlocked) {
@@ -25,9 +23,10 @@ const Stake = ({ tronLinkStatus, address }) => {
 				await setMintedNFTData(address, 5);
 				await setStakedNFTData(address, 5);
 			};
+			console.log("mintedCardList: ", mintedCardList);
 			setAllData();
 		}
-	}, [tronLinkStatus, mintedCardListRef, stakedCardListRef]);
+	}, [tronLinkStatus]);
 
 	const setStakedNFTData = async (address, limit) => {
 		setIsStakedDataLoading(true);

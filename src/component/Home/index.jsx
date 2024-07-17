@@ -11,6 +11,7 @@ const Home = () => {
 	const [account, setAccount] = useState("");
 	const location = useLocation();
 	const [utmSource, setUtmSource] = useState("");
+	const TRONGRID_API_KEY = process.env.REACT_APP_TRONGRID_API_KEY;
 
 	const [tronLinkStatus, setTronLinkStatus] = useState({
 		installed: false,
@@ -24,6 +25,7 @@ const Home = () => {
 			const { tronWeb } = window;
 
 			if (tronWeb && tronWeb.ready) {
+				tronWeb.setHeader({ "TRON-PRO-API-KEY": TRONGRID_API_KEY });
 				const newAccount = tronWeb.defaultAddress.base58;
 
 				if (newAccount !== currentAccount) {
@@ -49,6 +51,8 @@ const Home = () => {
 		const check = async () => {
 			if (window.tronWeb && window.tronWeb.ready) {
 				try {
+					window.tronWeb.setHeader({ "TRON-PRO-API-KEY": TRONGRID_API_KEY });
+
 					// await window.tronWeb.request({
 					// 	method: "tron_requestAccounts",
 					// });

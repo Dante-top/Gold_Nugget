@@ -7,11 +7,12 @@ const SolidityNode = "https://api.trongrid.io";
 const EventServer = "https://api.trongrid.io";
 const privateKey = process.env.REACT_APP_PRIVATE_KEY;
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
+const TRONGRID_API_KEY = process.env.REACT_APP_TRONGRID_API_KEY;
 
 // Initialize TronWeb
 // const tronWeb = new TronWeb({
 // 	fullHost: FullNode,
-// 	headers: { "TRON-PRO-API-KEY": apiKey }, // This is a hypothetical example; adjust based on actual API requirements
+// 	headers: { "TRON-PRO-API-KEY": TRONGRID_API_KEY }, // This is a hypothetical example; adjust based on actual API requirements
 // });
 
 const tronWeb = new TronWeb(FullNode, SolidityNode, EventServer);
@@ -23,6 +24,7 @@ const stakeContractAddress = process.env.REACT_APP_STAKE_CONTRACT_ADDRESS || "";
 const getTokenContract = async () => {
 	if (window) {
 		try {
+			window.tronWeb.setHeader({ "TRON-PRO-API-KEY": TRONGRID_API_KEY });
 			if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
 				const tokenContract = await window.tronWeb
 					.contract()
@@ -36,6 +38,7 @@ const getTokenContract = async () => {
 const getNFTContract = async () => {
 	if (window) {
 		try {
+			window.tronWeb.setHeader({ "TRON-PRO-API-KEY": TRONGRID_API_KEY });
 			if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
 				const nftContract = await window.tronWeb
 					.contract()
@@ -49,6 +52,7 @@ const getNFTContract = async () => {
 const getStakeContract = async () => {
 	if (window) {
 		try {
+			window.tronWeb.setHeader({ "TRON-PRO-API-KEY": TRONGRID_API_KEY });
 			if (window.tronWeb && window.tronWeb.defaultAddress.base58) {
 				const stakeContract = await window.tronWeb
 					.contract()

@@ -11,6 +11,9 @@ const MintedCard = ({ mintedData }) => {
 		if (resStakeData.isSuccess) {
 			setIsStaking((prev) => ({ ...prev, [tokenId]: false }));
 			ToastSuccessMsg("Stake Success!");
+			setTimeout(() => {
+				window.location.reload(true);
+			}, 2000);
 		} else {
 			setIsStaking((prev) => ({ ...prev, [tokenId]: false }));
 			ToastErrMsg("Error happened while processing, please try again later");
