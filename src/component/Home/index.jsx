@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 
 import Stake from "../Stake";
 import Claim from "../Claim";
 import Faq from "../Faq";
 import { ToastErrMsg } from "../Toast";
 import Navbar from "../Navbar";
+const TRONGRID_API_KEY = process.env.REACT_APP_TRONGRID_API_KEY;
 
 const Home = () => {
 	const [account, setAccount] = useState("");
-	const location = useLocation();
-	const [utmSource, setUtmSource] = useState("");
-	const TRONGRID_API_KEY = process.env.REACT_APP_TRONGRID_API_KEY;
 
 	const [tronLinkStatus, setTronLinkStatus] = useState({
 		installed: false,
@@ -103,25 +100,6 @@ const Home = () => {
 			);
 		}
 	}, [tronLinkStatus]);
-
-	useEffect(() => {
-		try {
-			const params = new URLSearchParams(location.search);
-			const source = params.get("utm_source");
-			setUtmSource(source);
-
-			// If you need to do something specific with the utm_source
-			if (source === "tronlink") {
-				// Handle the case for tronlink
-				console.log("TronLink source detected");
-			} else {
-				// Handle other sources or absence of source
-				console.log("Other or no source detected");
-			}
-		} catch (error) {
-			console.error("Error parsing query parameters:", error);
-		}
-	}, [location.search]);
 
 	return (
 		<div className="bg-black">

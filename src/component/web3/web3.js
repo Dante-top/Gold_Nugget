@@ -91,7 +91,7 @@ export const getAvailableToken = async () => {
 					.balanceOf(window.tronWeb.defaultAddress.base58)
 					.call();
 				if (balance) {
-					return { isSuccess: true, balance: balance.toString() };
+					return { isSuccess: true, balance: balance.toString() / 100 };
 				} else {
 					return { isSuccess: false, balance: 0 };
 				}
@@ -118,7 +118,7 @@ export const getOwnersAddress = async () => {
 				if (goldTokenOwnersList) {
 					for (let i = 0; i < goldTokenOwnersList[0].length; i++) {
 						const owner = tronWeb.address.fromHex(goldTokenOwnersList[0][i]);
-						const tokenAmount = goldTokenOwnersList[1][i].toString();
+						const tokenAmount = goldTokenOwnersList[1][i].toString() / 100;
 						const rewardTime = convertTimestampToFormattedDate(
 							goldTokenOwnersList[2][i].toString()
 						);

@@ -47,17 +47,6 @@ const Claim = ({ tronLinkStatus, address }) => {
 		}
 	}, [ownersListRef, tronLinkStatus]);
 
-	// useEffect(() => {
-	// 	const interval = setInterval(async () => {
-	// 		if (!isClaiming) {
-	// 			// Check if not already claiming to avoid overlapping calls
-	// 			await handleClaim();
-	// 		}
-	// 	}, 60000); // 1 minutes
-
-	// 	return () => clearInterval(interval); // Cleanup interval on component unmount
-	// }, [isClaiming, handleClaim]); // Depend on isClaiming to ensure the latest state is useds
-
 	const setMinedAddress = async () => {
 		const resData = await getOwnersAddress();
 		if (resData.isSuccess) {
@@ -114,14 +103,14 @@ const Claim = ({ tronLinkStatus, address }) => {
 				</div>
 				<div className="col-lg-6 px-3">
 					<div className="row-content d-flex flex-column p-2 justify-content-start align-items-center">
-						<h5 className="row-title">Next Gold Nugget Mined in:</h5>
+						<h5 className="row-title">Next Batch of Gold Nuggets Mined in:</h5>
 						<Countdown
 							date={calculateNextSixHours()}
 							renderer={(props) => (
 								<h3 className="text-black mb-2">{`${props.hours}:${props.minutes}`}</h3>
 							)}
 						/>
-						<h5 className="row-title">Available Gold Nugget</h5>
+						<h5 className="row-title">Gold Nuggets</h5>
 						<h3 className="text-black mb-2">{available}</h3>
 						<>
 							{!isClaiming ? (

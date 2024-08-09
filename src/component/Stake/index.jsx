@@ -23,7 +23,6 @@ const Stake = ({ tronLinkStatus, address }) => {
 				await setMintedNFTData(address, 5);
 				await setStakedNFTData(address, 5);
 			};
-			console.log("mintedCardList: ", mintedCardList);
 			setAllData();
 		}
 	}, [tronLinkStatus]);
